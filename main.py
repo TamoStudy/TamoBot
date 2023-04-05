@@ -4,6 +4,7 @@ from discord import Embed
 from discord.ext import commands
 from discord import app_commands
 from tamo_secrets import TamoSecrets
+from eight_ball import EightBall
 
 # set up the bot client with intents
 bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
@@ -79,6 +80,11 @@ async def roll(interaction: discord.Interaction, max_roll: str = '100'):
     embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
 
     await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name='8ball', description='Magic 8 ball')
+async def eightball(interaction: discord.Interaction, question: str):
+    response = EightBall.get_response()
+    await interaction.response.send_message(f'**Question**: {question}\n**Answer**: {response}')
 
 @bot.tree.command(name='rules', description='Displays the rules for the server.')
 async def rules(interaction: discord.Interaction):
