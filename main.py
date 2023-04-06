@@ -1,5 +1,6 @@
 import discord
 import random
+from mysqlconnection import MySQLConnection
 from discord import Embed
 from discord.ext import commands
 from discord import app_commands
@@ -9,9 +10,13 @@ from eight_ball import EightBall
 # set up the bot client with intents
 bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
+db = MySQLConnection()
 
 @bot.event
 async def on_ready():
+    # Connect to mySQL database
+    db.connect()
+
     # bot is only allowed on allowed servers
     print(f'{bot.user} has connected to Discord!')
     print(f'{bot.user} is connected to the following guilds:')

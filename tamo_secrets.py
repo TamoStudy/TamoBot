@@ -27,3 +27,19 @@ class TamoSecrets:
     @staticmethod
     def get_client_secret():
         return TamoSecrets.read("client_secret")
+    
+    @staticmethod
+    def get_db_host():
+        return TamoSecrets.read("dbhost")
+    
+    @staticmethod
+    def get_db_user():
+        return TamoSecrets.read("dbuser")
+    
+    @staticmethod
+    def get_db_pass():
+        return TamoSecrets.read("dbpass")
+    
+    @staticmethod
+    def get_db_database():
+        return TamoSecrets.read("dbdatabase")
