@@ -1,17 +1,36 @@
-import discord
-import random
-from mysqlconnection import MySQLConnection
-from discord import Embed
-from discord.ext import commands
-from discord import app_commands
-from tamo_secrets import TamoSecrets
-from eight_ball import EightBall
+"""
+TamoBot - main.py
+by: narlock
 
-# set up the bot client with intents
+The main runner of the TamoBot.
+Contains standard pattern for Discord Bot creation utilizing discord.py
+"""
+# Required imports
+import discord
+from sql.mysqlconnection import MySQLConnection
+from discord.ext import commands
+
+# Load TamoBot secrets
+from tamo_secrets import TamoSecrets
+
+# TamoBot Applications
+from apps.misc.eight_ball import EightBall
+from apps.misc.roll import Roll
+from apps.info.rules import Rules
+
+# Initialize TamoBot and related connections
 bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
 db = MySQLConnection()
 
+"""
+The on_ready event will trigger when the bot starts up
+
+1. Connects to the Tamo database.
+2. Ensures that the TamoBot is only connected to allowed servers.
+3. Sets the status of the TamoBot.
+4. Syncs the slash commands.
+"""
 @bot.event
 async def on_ready():
     # Connect to mySQL database
@@ -31,11 +50,19 @@ async def on_ready():
 
     # Sync commands
     synced = await bot.tree.sync()
-    print('Slash CMDS Synced: ' + str(len(synced)))
+    print('TamoBot Slash CMDS Synced: ' + str(len(synced)))
 
+    # Indicate on_ready is complete
+    print('On ready is complete!')
+
+"""
+The on_guild_join functionality is used to ensure that the TamoBot
+only joins servers that is has been assigned to join.
+
+The TamoBot will leave servers that it has not been assigned to join.
+"""
 @bot.event
 async def on_guild_join(guild):
-    # Get the guild's ID
     guild_id = guild.id
     print(f"Joined guild with ID: {guild_id}")
     print(type(guild.id))
@@ -47,72 +74,39 @@ async def on_guild_join(guild):
     else:
         print(f"Bot joined authorized server: {guild.name}")
 
-# define the "hello" command
-@bot.tree.command(name='hello', description='say hello')
-async def hello(interaction: discord.Interaction):
-    # send a message to the user who entered the command
-    await interaction.response.send_message(content='Hello!')
-    
+"""
+/roll [max_roll]
+
+Rolls a random number between 1 and a maximum number (default 100)
+- Utilizes /apps/misc/roll.py for logic and embed.
+"""
 @bot.tree.command(name='roll', description='Rolls a random number between 1 and a max number (default 100)')
 async def roll(interaction: discord.Interaction, max_roll: str = '100'):
-    """
-    Rolls a random number between 1 and a maximum number (default 100)
-    Usage: !roll [max_roll]
-    """
-    footer_message = None
-    roll_message = 'Unexpected error occurred during /roll command.'
-    try:
-        max_roll = int(max_roll)
-    except ValueError:
-        roll_message = 'The maximum roll value must be an integer.'
-        footer_message = 'Use the /roll command to try again.'
-        return
-
-    if max_roll < 1:
-        roll_message = 'The maximum roll value must be greater than or equal to 1.'
-        footer_message = 'Use the /roll command to try again.'
-    elif max_roll > 99999:
-        roll_message = 'The maximum roll value cannot exceed 99999.'
-        footer_message = 'Use the /roll command to try again.'
-    else:
-        roll_number = random.randint(1, max_roll)
-        roll_message = f"{interaction.user.name} rolled a {roll_number} out of {max_roll}!"
-
-    embed = discord.Embed(title=f'{roll_message}', color=0xffa500)
-    embed.set_thumbnail(url=f'{interaction.user.avatar.url}')
-    if footer_message is not None:
-        embed.add_field(name='\u200b', value=footer_message)
-    embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
-
+    embed = Roll.perform_action(interaction, max_roll)
     await interaction.response.send_message(embed=embed)
 
+"""
+/8ball [Question]
+
+User can ask a question and receive a random response, similar to a magic 8-ball.
+- Utilizes /apps/misc/8ball.py to create embed and perform action.
+"""
 @bot.tree.command(name='8ball', description='Magic 8 ball')
 async def eightball(interaction: discord.Interaction, question: str):
     response = EightBall.get_response()
     await interaction.response.send_message(f'**Question**: {question}\n**Answer**: {response}')
 
+"""
+/rules
+
+Displays the rules for the server.
+- Utilizes /apps/info/rules.py to create embed for rules.
+"""
 @bot.tree.command(name='rules', description='Displays the rules for the server.')
 async def rules(interaction: discord.Interaction):
-    """
-    Displays the rules for the server.
-    """
     rules_channel = bot.get_channel(821757961830793239)
-
-    embed = discord.Embed(title='Server Rules', color=0xff3a40)
-    embed.set_thumbnail(url='https://github.com/narlock/Kaizen/blob/main/KaizenClient/assets/INFO_ERROR_ORANGE.png?raw=true')
-    embed.add_field(name='\u200b', value='**1** → Always follow [Discord\'s official Terms of Service](https://discord.com/terms)', inline = False)
-    embed.add_field(name='\u200b', value='**2** → Be respectful to other users; any form of discrimination will not be tolerated.', inline = False)
-    embed.add_field(name='\u200b', value='**3** → Initiating in fights/controversial discussion will not be tolerated.', inline = False)
-    embed.add_field(name='\u200b', value='**4** → Do not send harmful material such as viruses, IP-grabbers, or harm-ware.', inline = False)
-    embed.add_field(name='\u200b', value='**5** → Advertising of other servers/websites will not be tolerated.', inline = False)
-    embed.add_field(name='\u200b', value='**6** → Use common sense. If you think it\'s going to get you in trouble, odds are it will.', inline = False)
-    embed.add_field(name='\u200b', value='**7** → English only in text channels. You may speak in other languages in <#1030510653003276318>.', inline = False)
-    embed.add_field(name='\u200b', value='**8** → Impersonating other users will not be tolerated.', inline = False)
-    embed.add_field(name='\u200b', value=f'**Refer to {rules_channel.mention} for more information**.', inline = False)
-
+    embed = Rules.get_rules_embed(rules_channel)
     await interaction.response.send_message(embed=embed)
 
-
-# Start the bot
-print(TamoSecrets.get_server())
+# Starts the TamoBot
 bot.run(TamoSecrets.get_token())
