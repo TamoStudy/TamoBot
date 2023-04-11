@@ -10,12 +10,19 @@ import discord
 from sql.mysqlconnection import MySQLConnection
 from discord.ext import commands
 
+
+# For tabs
+import asyncio
+from typing import Union
+
+
 # Load TamoBot secrets
 from tamo_secrets import TamoSecrets
 
 # TamoBot Applications
 from apps.misc.eight_ball import EightBall
 from apps.misc.roll import Roll
+from apps.misc.motivation import Motivation
 from apps.info.rules import Rules
 
 # Initialize TamoBot and related connections
@@ -74,6 +81,8 @@ async def on_guild_join(guild):
     else:
         print(f"Bot joined authorized server: {guild.name}")
 
+# Misc Commands
+
 """
 /roll [max_roll]
 
@@ -95,6 +104,30 @@ User can ask a question and receive a random response, similar to a magic 8-ball
 async def eightball(interaction: discord.Interaction, question: str):
     response = EightBall.get_response()
     await interaction.response.send_message(f'**Question**: {question}\n**Answer**: {response}')
+
+"""
+/motivation
+
+User requests motivation from TamoBot, TamoBot responds with giving
+the user a motivational message.
+- Utilizes /apps/misc/motivation.py to create a message for the user.
+"""
+@bot.tree.command(name='motivation', description='Get some motivation!')
+async def motivation(interaction: discord.Interaction):
+    response = Motivation.get_motivation_embed(interaction)
+    await interaction.response.send_message(response)
+
+# Info Commands
+
+"""
+/help
+
+Displays the commands of the server.
+- Utilizes /apps/info/help.py for embed integration
+"""
+@bot.tree.command(name='help', description='Information on how to use TamoBot')
+async def help(interaction: discord.Interaction):
+    pass
 
 """
 /rules

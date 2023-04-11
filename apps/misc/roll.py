@@ -20,8 +20,11 @@ class Roll:
                 roll_message = 'The maximum roll value cannot exceed 99999.'
                 footer_message = 'Use the /roll command to try again.'
             else:
+                member = interaction.guild.get_member(interaction.user.id)
+                username = member.nick if member.nick is not None else member.name
+        
                 roll_number = random.randint(1, max_roll)
-                roll_message = f"{interaction.user.name} rolled a {roll_number} out of {max_roll}!"
+                roll_message = f"{username} rolled a {roll_number} out of {max_roll}!"
         except ValueError:
             roll_message = 'The maximum roll value must be an integer.'
             footer_message = 'Use the /roll command to try again.'
