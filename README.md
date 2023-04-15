@@ -39,7 +39,6 @@ Show support for this project by leaving a ⭐️ on our repository!
     - [Arcade](#arcade)
     - [General](#general)
 - [Software Design](#software-design)
-- [Original Concept Idea](#original-concept-idea)
 
 ## **Features**
 
@@ -108,4 +107,3 @@ Show support for this project by leaving a ⭐️ on our repository!
 <img src="./README%20Assets/ERDPhase1.png" width="800px" style="border-radius: 20px;">
 </p>
 
-## **Original Concept Idea**
