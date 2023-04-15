@@ -91,9 +91,9 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
 
 @bot.tree.command(name='stats', description='Displays the statistics of a user')
 async def stats(interaction: discord.Interaction, user: discord.User = None):
-    TimeTrack.update_time_on_call(interaction, user)
-    Stats.show_statistics(interaction, user)
-    await interaction.response.send_message("In Development!")
+    # TimeTrack.update_time_on_call(interaction, user)
+    embed = Stats.show_statistics(interaction, user)
+    await interaction.response.send_message(embed=embed)
     
 # Misc Commands
 
