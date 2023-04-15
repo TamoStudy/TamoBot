@@ -56,14 +56,10 @@ Show support for this project by leaving a ⭐️ on our repository!
 - Users can utilize the `/top` command to view the all time leaders in focus time on the server.
 
 <p align="center">
-<img src="./README%20Assets/Roll.png" style="border-radius: 20px;">
+<img src="./README%20Assets/Top.png" style="border-radius: 20px;">
 </p>
 
 - Additionally, users can add parameters to this command. `/top month` will display the top users during the current month.
-
-<p align="center">
-<img src="./README%20Assets/Roll.png" style="border-radius: 20px;">
-</p>
 
 ### **Shop**
 - The Shop allows users to purchase cosmetic customization options to add flair to their experience utilizing TamoBot. By using the `/shop` command, the list of shop options will appear to the user.
@@ -74,15 +70,7 @@ Show support for this project by leaving a ⭐️ on our repository!
 
 - *Embed Profile Color Customization*: Utilizing `/shop embed`, the user can purchase a custom color embed to change the color of the Discord embed when a profile related command is called. By default, this costs the user `1000` Tamo tokens. Server administrators can modify this value.
 
-<p align="center">
-<img src="./README%20Assets/Roll.png" style="border-radius: 20px;">
-</p>
-
 - *Color Role*: Utilizing `/shop color`, the user can purchase a custom color role from a given list of colors. By default, this costs the user `500` Tamo tokens. Server administrators can modify this value, as well as specify the roles that are included for purchase.
-
-<p align="center">
-<img src="./README%20Assets/Roll.png" style="border-radius: 20px;">
-</p>
 
 ### **Arcade**
 - In addition to using Tamo tokens as a means to enhance the flair of the user's experience, TamoBot also provides interactive 'arcade-style' games for the user to enjoy during their downtime. To view the list of games in the arcade, the user can type `/arcade`. This command will direct the user for the cost of each game, as well as the command to play it. By default, the cost to play any arcade game is `100` Tamo tokens. Server administrators can modify this value.
@@ -98,7 +86,7 @@ Show support for this project by leaving a ⭐️ on our repository!
 - TamoBot also provides general commands that are useful for all Discord servers. The user can utilize the `/help` command to view all of the bot's command at any time.
 
 <p align="center">
-<img src="./README%20Assets/Roll.png" style="border-radius: 20px;">
+<img src="./README%20Assets/Help.png" style="border-radius: 20px;">
 </p>
 
 - The following are some general commands the user can utilize via TamoBot.
