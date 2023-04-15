@@ -19,6 +19,7 @@ from tamo_secrets import TamoSecrets
 
 # TamoBot Applications
 from apps.time.time_track import TimeTrack
+from apps.time.top import Top
 
 from apps.misc.eight_ball import EightBall
 from apps.misc.roll import Roll
@@ -93,6 +94,13 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
 async def stats(interaction: discord.Interaction, user: discord.User = None):
     # TimeTrack.update_time_on_call(interaction, user)
     embed = Stats.show_statistics(interaction, user)
+    await interaction.response.send_message(embed=embed)
+
+@bot.tree.command(name='top', description='View the current all time focus leaders')
+async def top(interaction: discord.Interaction):
+    # Get top users from database, user1=, user2= ...
+    user1 = bot.fetch_user(481296666377453588)
+    embed = Top.display_top(interaction, user1)
     await interaction.response.send_message(embed=embed)
     
 # Misc Commands

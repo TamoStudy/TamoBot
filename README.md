@@ -48,7 +48,7 @@ Show support for this project by leaving a ⭐️ on our repository!
 - The `/stats` command will give the user a brief description of their profile in relation to their focus performance on the server. The Bot will display a Discord Embed containing the relevant user data.
 
 <p align="center">
-<img src="./README%20Assets/Roll.png" style="border-radius: 20px;">
+<img src="./README%20Assets/Stats.png" style="border-radius: 20px;">
 </p>
 
 - By default, every `144` seconds spent in a specified list of 'focus' voice channels will earn the user a single Tamo token. Tamo tokens can be utilized for the interactive and customization functions that are described later in this feature list. Server administrators will be able to change this value, as well as set specified 'focus' voice channels.
