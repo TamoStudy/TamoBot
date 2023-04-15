@@ -11,6 +11,6 @@ class Stats():
         embed.set_thumbnail(url=f'{interaction.user.avatar.url}')
         embed.add_field(name='General', value=':calendar: **Month Rank:** #2 (10 hrs)\n:star: **Focus Rank:** #5 (34 hrs)\n<:customEmote:1096777370318413954> **Tamo Tokens:** 1234', inline = False)
         embed.add_field(name='Arcade', value=':question: **Trivia Rank:** #10 (2)')
-        embed.set_footer(text='Powered by [**narlock.dev**](https://narlock.github.io/narlock)')
+        embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
 
         return embed
