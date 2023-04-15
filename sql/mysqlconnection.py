@@ -1,5 +1,10 @@
 import mysql.connector
 import datetime
+
+from sql.model.dbUser import DBUser
+from sql.model.dbMonthTime import DBMonthTime
+from sql.model.dbDailyTime import DBDailyTime
+
 from tamo_secrets import TamoSecrets
 from tools.tamolog import TamoLogger
 
@@ -69,7 +74,7 @@ class MySQLConnection:
         
         sql = f'''
                 INSERT INTO monthtime
-                (id, mth, yr, stime)
+                (user_id, mth, yr, stime)
                 VALUES
                 ({user_id}, {current_month}, {current_year}, 0)
             '''
@@ -94,7 +99,7 @@ class MySQLConnection:
         
         sql = f'''
                 INSERT INTO dailytime
-                (id, d, mth, yr, stime)
+                (user_id, d, mth, yr, stime)
                 VALUES
                 ({user_id}, {current_day}, {current_month}, {current_year}, 0)
             '''
@@ -111,21 +116,128 @@ class MySQLConnection:
     ##########################################
     ##########################################
 
-    def fetch_user_profile_by_id(self, user_id):
-        # TODO
-        pass
+    def fetch_user_profile_by_id(self, user_id: int):
+        """
+        Fetches a user by their ID from the database.
+
+        Args:
+            user_id (int): The user's Discord ID.
+
+        Returns:
+            tuple: A tuple containing the user's data, or None if the user is not found.
+        """
+        cursor = self.connection.cursor()
+        sql = f"SELECT * FROM user WHERE id={user_id}"
+        cursor.execute(sql)
+        result = cursor.fetchone()
+
+        if result is None:
+            return None
+
+        return DBUser(*result)
 
     def fetch_top_3_stime_users(self):
-        # TODO
-        pass
+        """
+        Fetches the top 3 users with the highest stime values from the user table.
+
+        Returns:
+            A list of the top 3 users as `DBUser` objects, sorted by stime in descending order.
+        """
+        cursor = self.connection.cursor()
+        query = "SELECT id, stime FROM user ORDER BY stime DESC LIMIT 3"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        top_users = []
+        for result in results:
+            user = DBUser(*result)
+            top_users.append(user)
+        return top_users
 
     def fetch_top_3_stime_monthly_users(self):
-        # TODO
-        pass
+        """
+        Fetches the top 3 users with the highest monthly stime from the monthtime table.
+
+        Returns:
+            dict: A dictionary containing user objects mapped to their corresponding monthly stime
+        """
+        cursor = self.connection.cursor()
+        query = """
+                SELECT user_id, stime
+                FROM monthtime
+                GROUP BY user_id
+                ORDER BY stime DESC
+                LIMIT 3
+                """
+        cursor.execute(query)
+        results = cursor.fetchall()
+        top_users = {}
+        for result in results:
+            user_id, monthly_stime = result
+            user = self.fetch_user_by_id(user_id)
+            top_users[user_id] = (user, monthly_stime)
+        return top_users
 
     def fetch_top_3_trivia_users(self):
-        # TODO
-        pass
+        """
+        Fetches the top 3 users with the highest trivia scores from the database.
+
+        Returns:
+            list: A list containing the top 3 users with the highest trivia scores.
+        """
+        cursor = self.connection.cursor()
+        query = "SELECT id, trivia FROM user ORDER BY trivia DESC LIMIT 3"
+        cursor.execute(query)
+        results = cursor.fetchall()
+        top_users = []
+        for result in results:
+            user = DBUser(*result)
+            top_users.append(user)
+        return top_users
+
+    def fetch_month_time_of_user(self, user_id, month, year):
+        """
+        Fetches the monthly stime of a user for a given month and year.
+
+        Args:
+            user_id (int): The user's Discord ID.
+            month (int): The month (1-12) for which to fetch the stime.
+            year (int): The year for which to fetch the stime.
+
+        Returns:
+            int: The monthly stime of the user for the specified month and year, or None if the user is not found.
+        """
+        cursor = self.connection.cursor()
+        sql = f"SELECT stime FROM monthtime WHERE user_id = {user_id} AND mth = {month} AND yr = {year}"
+        cursor.execute(sql)
+        result = cursor.fetchone()
+
+        if result is None:
+            return None
+
+        return result[0]
+
+    def fetch_daily_time_of_user(self, user_id, day, month, year):
+        """
+        Fetches the daily stime of a user for a given day, month, and year.
+
+        Args:
+            user_id (int): The user's Discord ID.
+            day (int): The day of the month (1-31) for which to fetch the stime.
+            month (int): The month (1-12) for which to fetch the stime.
+            year (int): The year for which to fetch the stime.
+
+        Returns:
+            int: The daily stime of the user for the specified day, month, and year, or None if the user is not found.
+        """
+        cursor = self.connection.cursor()
+        sql = f"SELECT stime FROM dailytime WHERE user_id = {user_id} AND d = {day} AND mth = {month} AND yr = {year}"
+        cursor.execute(sql)
+        result = cursor.fetchone()
+
+        if result is None:
+            return None
+
+        return result[0]
 
     ##########################################
     ##########################################
