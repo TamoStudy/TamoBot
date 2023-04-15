@@ -10,20 +10,22 @@ import discord
 from sql.mysqlconnection import MySQLConnection
 from discord.ext import commands
 
-
 # For tabs
 import asyncio
 from typing import Union
-
 
 # Load TamoBot secrets
 from tamo_secrets import TamoSecrets
 
 # TamoBot Applications
+from apps.time.time_track import TimeTrack
+
 from apps.misc.eight_ball import EightBall
 from apps.misc.roll import Roll
 from apps.misc.motivation import Motivation
+
 from apps.info.rules import Rules
+from apps.info.stats import Stats
 
 # Initialize TamoBot and related connections
 bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
@@ -81,6 +83,18 @@ async def on_guild_join(guild):
     else:
         print(f"Bot joined authorized server: {guild.name}")
 
+# Timer Event
+
+@bot.event
+async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+    TimeTrack.update_time_on_event(member, before, after)
+
+@bot.tree.command(name='stats', description='Displays the statistics of a user')
+async def stats(interaction: discord.Interaction, user: discord.User = None):
+    TimeTrack.update_time_on_call(interaction, user)
+    Stats.show_statistics(interaction, user)
+    await interaction.response.send_message("In Development!")
+    
 # Misc Commands
 
 """
@@ -113,8 +127,8 @@ the user a motivational message.
 - Utilizes /apps/misc/motivation.py to create a message for the user.
 """
 @bot.tree.command(name='motivation', description='Get some motivation!')
-async def motivation(interaction: discord.Interaction):
-    response = Motivation.get_motivation_embed(interaction)
+async def motivation(interaction: discord.Interaction, user: discord.User = None):
+    response = Motivation.get_motivation_embed(interaction, user)
     await interaction.response.send_message(response)
 
 # Info Commands

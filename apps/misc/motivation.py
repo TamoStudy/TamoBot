@@ -4,9 +4,14 @@ import random
 class Motivation:
 
     @staticmethod
-    def get_motivation_embed(interaction: discord.Interaction):
+    def get_motivation_embed(interaction: discord.Interaction, user: discord.User):
         member = interaction.guild.get_member(interaction.user.id)
-        username = member.nick if member.nick is not None else member.name
+        
+        if user is not None and isinstance(user, discord.member.Member):
+            username = user.mention
+        else:
+            username = member.nick if member.nick is not None else member.name
+        
         messages = [
             f"You got this, **{username}**!",
             f"Believe in yourself, **{username}**!",
