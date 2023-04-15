@@ -9,8 +9,6 @@ Contains standard pattern for Discord Bot creation utilizing discord.py
 import discord
 from sql.mysqlconnection import MySQLConnection
 from discord.ext import commands
-
-# Load TamoBot secrets
 from tamo_secrets import TamoSecrets
 
 # TamoBot Applications
