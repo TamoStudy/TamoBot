@@ -65,7 +65,7 @@ Show support for this project by leaving a ⭐️ on our repository!
 - The Shop allows users to purchase cosmetic customization options to add flair to their experience utilizing TamoBot. By using the `/shop` command, the list of shop options will appear to the user.
 
 <p align="center">
-<img src="./README%20Assets/Roll.png" style="border-radius: 20px;">
+<img src="./README%20Assets/Shop.png" style="border-radius: 20px;">
 </p>
 
 - *Embed Profile Color Customization*: Utilizing `/shop embed`, the user can purchase a custom color embed to change the color of the Discord embed when a profile related command is called. By default, this costs the user `1000` Tamo tokens. Server administrators can modify this value.
