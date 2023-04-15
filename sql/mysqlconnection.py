@@ -124,7 +124,7 @@ class MySQLConnection:
             user_id (int): The user's Discord ID.
 
         Returns:
-            tuple: A tuple containing the user's data, or None if the user is not found.
+            DBUser of the fetched user.
         """
         cursor = self.connection.cursor()
         sql = f"SELECT * FROM user WHERE id={user_id}"
@@ -238,6 +238,77 @@ class MySQLConnection:
             return None
 
         return result[0]
+    
+    def fetch_profile_by_id(self, user_id):
+        """
+        Fetch the user's monthtime.stime, along with the rank of the 
+        user's monthtime.stime. That is, compare it against all of 
+        the other users in the database and obtain a position ranking (int).
+        """
+
+        cursor = self.connection.cursor()
+        sql = f"SELECT stime FROM monthtime WHERE user_id={user_id} ORDER BY stime DESC"
+        cursor.execute(sql)
+        month_stime = cursor.fetchone()[0] if cursor.rowcount > 0 else None
+
+        if month_stime is None:
+            month_rank = None
+        else:
+            sql = f"SELECT COUNT(*)+1 FROM monthtime WHERE stime>{month_stime}"
+            cursor.execute(sql)
+            month_rank = cursor.fetchone()[0]
+
+        """
+        Fetch the user's stime, along with the rank of the 
+        user's stime. Similarly, compare it against all of 
+        the other users in the database and obtain a position ranking (int).
+        """
+
+        sql = f"SELECT stime FROM user ORDER BY stime DESC"
+        cursor.execute(sql)
+        user_stime = None
+        user_rank = None
+        for rank, row in enumerate(cursor):
+            if row[0] is None:
+                break
+            if row[1] == user_id:
+                user_stime = row[0]
+                user_rank = rank+1
+                break
+
+        """
+        Fetch for user.tokens
+        """
+
+        sql = f"SELECT tokens FROM user WHERE id={user_id}"
+        cursor.execute(sql)
+        user_tokens = cursor.fetchone()[0]
+
+        """
+        Fetch for user.trivia, along with the rank of the user's trivia.
+        Similarly, compare it against all of the other users in the database
+        and obtain a position ranking (int)
+        """
+
+        sql = f"SELECT trivia FROM user ORDER BY trivia DESC"
+        cursor.execute(sql)
+        user_trivia = None
+        trivia_rank = None
+        for rank, row in enumerate(cursor):
+            if row[0] is None:
+                break
+            if row[1] == user_id:
+                user_trivia = row[0]
+                trivia_rank = rank+1
+                break
+
+        """
+        Finally, return the following information:
+
+        (month rank, monthtime.stime, focus rank, user.stime, user.tokens, trivia rank, user.trivia)
+        """
+
+        return (month_rank, month_stime, user_rank, user_stime, user_tokens, trivia_rank, user_trivia)
 
     ##########################################
     ##########################################
@@ -247,25 +318,64 @@ class MySQLConnection:
     ##########################################
     ##########################################
 
-    def update_user_total_entry(self, user_id, seconds):
+    def update_user_total_entry(self, user_id, seconds, tokens):
         # Add Tamo Tokens based off of amount of seconds studied, user.tokens
+        cursor = self.connection.cursor()
+        query = f"UPDATE user SET tokens = tokens + {tokens} WHERE id = {user_id}"
+        cursor.execute(query)
+        self.connection.commit()
 
         # Updates daily time, dailytime.stime
+        day = datetime.datetime.now().day
+        month = datetime.datetime.now().month
+        year = datetime.datetime.now().year
+        query = f"UPDATE dailytime SET stime = stime + {seconds} WHERE user_id = {user_id} AND d = {day} AND mth = {month} AND yr = {year}"
+        cursor.execute(query)
+        self.connection.commit()
 
         # Updates monthly time, monthtime.stime
+        query = f"UPDATE monthtime SET stime = stime + {seconds} WHERE user_id = {user_id} AND mth = {month} AND yr = {year}"
+        cursor.execute(query)
+        self.connection.commit()
 
         # Updates total time, user.stime
-
-        #TODO
-        pass
+        query = f"UPDATE user SET stime = stime + {seconds} WHERE id = {user_id}"
+        cursor.execute(query)
+        self.connection.commit()
 
     def update_user_hex(self, user_id, hex):
-        # Update user.hex attribute
-        pass
+        """
+        Updates the user's hex value in the database.
+
+        Args:
+            user_id (int): The user's Discord ID.
+            hex_value (str): The new hex value to be assigned to the user.
+
+        Returns:
+            None
+        """
+        cursor = self.connection.cursor()
+        query = "UPDATE user SET hex=%s WHERE id=%s"
+        values = (hex, user_id)
+        cursor.execute(query, values)
+        self.connection.commit()
 
     def update_user_feat(self, user_id, feat):
-        # Update user.feat attribute
-        pass
+        """
+        Updates the user's feat value in the database.
+
+        Args:
+            user_id (int): The user's Discord ID.
+            feat_value (str): The new feat value to be assigned to the user.
+
+        Returns:
+            None
+        """
+        cursor = self.connection.cursor()
+        query = "UPDATE user SET feat=%s WHERE id=%s"
+        values = (feat, user_id)
+        cursor.execute(query, values)
+        self.connection.commit()
 
     ##########################################
     ##########################################
