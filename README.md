@@ -8,7 +8,7 @@
 
 <!-- GitHub Shields-->
 <p align="center">
-  <a href="https://github.com/narlock/Kaizen/commits/main"><img src="https://img.shields.io/github/last-commit/narlock/Kaizen"></a>
+  <a href="https://github.com/narlock/Kaizen/commits/main"><img src="https://img.shields.io/github/last-commit/TamoStudy/TamoBot"></a>
   <a href="https://discord.gg/eEbEYbXaNS"><img src="https://discordapp.com/api/guilds/821757961830793236/widget.png?style=shield"></a>
 </p>
 
