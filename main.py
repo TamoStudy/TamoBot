@@ -7,6 +7,7 @@ Contains standard pattern for Discord Bot creation utilizing discord.py
 """
 # Required imports
 import discord
+from tools.tamolog import TamoLogger
 from sql.mysqlconnection import MySQLConnection
 from discord.ext import commands
 from tamo_secrets import TamoSecrets
@@ -30,7 +31,8 @@ from apps.arcade.arcade import Arcade
 # Initialize TamoBot and related connections
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
-db = MySQLConnection()
+db = MySQLConnection(TamoSecrets.get_db_database())
+time_tracker = TimeTrack(db)
 
 """
 The on_ready event will trigger when the bot starts up
@@ -46,23 +48,23 @@ async def on_ready():
     db.connect()
 
     # bot is only allowed on allowed servers
-    print(f'{bot.user} has connected to Discord!')
-    print(f'{bot.user} is connected to the following guilds:')
+    TamoLogger.log("SUCCESS", f'{bot.user} has connected to Discord!')
     for guild in bot.guilds:
         if guild.id != allowed_server:
+            TamoLogger.log("WARN", f'{bot.user} leaving unauthorized server {guild.name} (id: {guild.id})')
             await guild.leave()
         else:
-            print(f'- {guild.name} (id: {guild.id})')
+            TamoLogger.log("INFO", f'{bot.user} is connected to {guild.name} (id: {guild.id})')
 
     # Set status message
     await bot.change_presence(activity=discord.Game(name="/help | tamostudy.com"))
 
     # Sync commands
     synced = await bot.tree.sync()
-    print('TamoBot Slash CMDS Synced: ' + str(len(synced)))
+    TamoLogger.log('INFO', 'TamoBot Slash Commands Synced: ' + str(len(synced)))
 
     # Indicate on_ready is complete
-    print('On ready is complete!')
+    TamoLogger.log('SUCCESS', 'TamoBot is officially ready for use!')
 
 """
 The on_guild_join functionality is used to ensure that the TamoBot
@@ -73,15 +75,13 @@ The TamoBot will leave servers that it has not been assigned to join.
 @bot.event
 async def on_guild_join(guild):
     guild_id = guild.id
-    print(f"Joined guild with ID: {guild_id}")
-    print(type(guild.id))
-    print(type(allowed_server))
+    TamoLogger.log("INFO", f"Joined guild with ID: {guild_id}")
 
     if guild.id != allowed_server:
         await guild.leave()
-        print(f"Bot removed from unauthorized server: {guild.name}")
+        TamoLogger.log("WARN", f"Bot removed from unauthorized server: {guild.name}")
     else:
-        print(f"Bot joined authorized server: {guild.name}")
+        TamoLogger.log("INFO", f"Bot joined authorized server: {guild.name}")
 
 ##########################################
 ##########################################
@@ -93,7 +93,8 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
-    TimeTrack.update_time_on_event(member, before, after)
+    TamoLogger.log("INFO", f"Voice State Update received by {member.name}")
+    time_tracker.update_time_on_event(member, before, after)
 
 """
 /stats [user]
@@ -216,12 +217,25 @@ async def rules(interaction: discord.Interaction):
 ##########################################
 ##########################################
 ##########################################
+
+"""
+/arcade
+
+Displays the game options in the arcade.
+"""
 @bot.tree.command(name='arcade', description='Displays the game options in the arcade.')
 async def arcade(interaction: discord.Interaction):
     embed = Arcade.show_arcade_options()
     await interaction.response.send_message(embed=embed)
 
+"""
+/trivia
+
+Answer fun trivia questions (100 Tamo tokens)
+"""
+@bot.tree.command(name='trivia', description='Answer fun trivia questions (100 Tamo tokens)')
+async def trivia(interaction: discord.Interaction):
+    await interaction.response.send_message("This feature is currently in development")
+
 # Starts the TamoBot
 bot.run(TamoSecrets.get_token())
-
-

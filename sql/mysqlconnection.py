@@ -9,11 +9,11 @@ from tamo_secrets import TamoSecrets
 from tools.tamolog import TamoLogger
 
 class MySQLConnection:
-    def __init__(self):
+    def __init__(self, database):
         self.host = TamoSecrets.get_db_host()
         self.user = TamoSecrets.get_db_user()
         self.password = TamoSecrets.get_db_pass()
-        self.database = TamoSecrets.get_db_database()
+        self.database = database
         self.connection = None
 
     # Connect / Disconnect to Database
@@ -41,7 +41,7 @@ class MySQLConnection:
     ##########################################
     ##########################################
 
-    def create_user(self, user_id: int):
+    def create_user(self, user_id):
         """
         Creates a user in the database
 
@@ -326,9 +326,9 @@ class MySQLConnection:
         self.connection.commit()
 
         # Updates daily time, dailytime.stime
-        day = datetime.datetime.now().day
-        month = datetime.datetime.now().month
-        year = datetime.datetime.now().year
+        day = datetime.datetime.utcnow().day
+        month = datetime.datetime.utcnow().month
+        year = datetime.datetime.utcnow().year
         query = f"UPDATE dailytime SET stime = stime + {seconds} WHERE user_id = {user_id} AND d = {day} AND mth = {month} AND yr = {year}"
         cursor.execute(query)
         self.connection.commit()
