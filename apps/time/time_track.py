@@ -26,13 +26,18 @@ class TimeTrack():
             Calculate the focus time, update database, and then remove the member id from the
             user_time dictionary as they are no longer in a focus room.
             """
-            focused_time_of_member = round(time.time() - user_time[member.id])
-            tamo_tokens_earned = focused_time_of_member // 144
-            TamoLogger.log("INFO", str(member.name) + " left " + str(before.channel.name) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
-            del user_time[member.id]
+            try:
+                focused_time_of_member = round(time.time() - user_time[member.id])
+                tamo_tokens_earned = focused_time_of_member // 144
+                TamoLogger.log("INFO", str(member.name) + " left " + str(before.channel.name) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
+                del user_time[member.id]
 
-            # Update MySQL User Entry
-            TimeTrack.update_user_time_and_tokens_entry_in_database(member.id, focused_time_of_member, tamo_tokens_earned)
+                # Update MySQL User Entry
+                TimeTrack.update_user_time_and_tokens_entry_in_database(member.id, focused_time_of_member, tamo_tokens_earned)
+            except KeyError as e:
+                TamoLogger.log("ERROR", f"KeyError occurred when accessing user_time. Invalid Key: {e.args[0]}")
+            except:
+                TamoLogger.log("ERROR", "An unexpected error occurred inside of TimeTrack.update_time_on_event.")
 
     @staticmethod
     def update_time_on_call(interaction: discord.Interaction, user: discord.User):
@@ -54,13 +59,18 @@ class TimeTrack():
         # Check if user is in voice channel, if they are update info accordingly
         if user_id in user_time:
             # Update Time based on voice connection
-            focused_time_of_member = round(time.time() - user_time[user_id])
-            tamo_tokens_earned = focused_time_of_member // 144
-            TamoLogger.log("INFO", "Updating stats for " + str(user_id) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
-            user_time[user_id] = time.time()
+            try:
+                focused_time_of_member = round(time.time() - user_time[user_id])
+                tamo_tokens_earned = focused_time_of_member // 144
+                TamoLogger.log("INFO", "Updating stats for " + str(user_id) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
+                user_time[user_id] = time.time()
 
-            # Update MySQL User Entry
-            TimeTrack.update_user_time_and_tokens_entry_in_database(user_id, focused_time_of_member, tamo_tokens_earned)
+                # Update MySQL User Entry
+                TimeTrack.update_user_time_and_tokens_entry_in_database(user_id, focused_time_of_member, tamo_tokens_earned)
+            except KeyError as e:
+                TamoLogger.log("ERROR", f"KeyError occurred when accessing user_time. Invalid Key: {e.args[0]}")
+            except:
+                TamoLogger.log("ERROR", "An unexpected error occurred inside of TimeTrack.update_time_on_event.")
 
     @staticmethod
     def update_user_time_and_tokens_entry_in_database(user_id, focus_time, tokens):

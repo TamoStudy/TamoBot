@@ -10,10 +10,6 @@ import discord
 from sql.mysqlconnection import MySQLConnection
 from discord.ext import commands
 
-# For tabs
-import asyncio
-from typing import Union
-
 # Load TamoBot secrets
 from tamo_secrets import TamoSecrets
 
@@ -21,15 +17,18 @@ from tamo_secrets import TamoSecrets
 from apps.time.time_track import TimeTrack
 from apps.time.top import Top
 
+from apps.shop.shop import Shop
+
 from apps.misc.eight_ball import EightBall
 from apps.misc.roll import Roll
 from apps.misc.motivation import Motivation
 
+from apps.info.help import Help
 from apps.info.rules import Rules
 from apps.info.stats import Stats
 
 # Initialize TamoBot and related connections
-bot = commands.Bot(command_prefix='/', intents=discord.Intents.all())
+bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
 db = MySQLConnection()
 
@@ -84,26 +83,66 @@ async def on_guild_join(guild):
     else:
         print(f"Bot joined authorized server: {guild.name}")
 
-# Timer Event
+##########################################
+##########################################
+##########################################
+# Timer Events and Commands
+##########################################
+##########################################
+##########################################
 
 @bot.event
 async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
     TimeTrack.update_time_on_event(member, before, after)
 
+"""
+/stats [user]
+
+Displays the TamoBot statistics of the specified user. If no user is
+provided, the calling user is set as the user.
+"""
 @bot.tree.command(name='stats', description='Displays the statistics of a user')
 async def stats(interaction: discord.Interaction, user: discord.User = None):
     # TimeTrack.update_time_on_call(interaction, user)
     embed = Stats.show_statistics(interaction, user)
     await interaction.response.send_message(embed=embed)
 
+"""
+/top
+
+Displays the top three focus leaders on the server.
+"""
 @bot.tree.command(name='top', description='View the current all time focus leaders')
 async def top(interaction: discord.Interaction):
-    # Get top users from database, user1=, user2= ...
-    user1 = bot.fetch_user(481296666377453588)
-    embed = Top.display_top(interaction, user1)
+    # TODO Get top users from database, user1=, user2= ...
+    embed = Top.display_top(interaction)
     await interaction.response.send_message(embed=embed)
-    
+
+##########################################
+##########################################
+##########################################
+# Shop Commands
+##########################################
+##########################################
+##########################################
+
+"""
+/shop
+
+Displays the current server shop options.
+"""
+@bot.tree.command(name='shop', description='View the shop listings.')
+async def shop(interaction: discord.Interaction, shop: str = None):
+    embed = Shop.show_shop_options()
+    await interaction.response.send_message(embed=embed)
+
+##########################################
+##########################################
+##########################################
 # Misc Commands
+##########################################
+##########################################
+##########################################
 
 """
 /roll [max_roll]
@@ -139,7 +178,13 @@ async def motivation(interaction: discord.Interaction, user: discord.User = None
     response = Motivation.get_motivation_embed(interaction, user)
     await interaction.response.send_message(response)
 
+##########################################
+##########################################
+##########################################
 # Info Commands
+##########################################
+##########################################
+##########################################
 
 """
 /help
@@ -149,7 +194,8 @@ Displays the commands of the server.
 """
 @bot.tree.command(name='help', description='Information on how to use TamoBot')
 async def help(interaction: discord.Interaction):
-    pass
+    embed = Help.get_help_embed()
+    await interaction.response.send_message(embed=embed)
 
 """
 /rules
@@ -163,5 +209,20 @@ async def rules(interaction: discord.Interaction):
     embed = Rules.get_rules_embed(rules_channel)
     await interaction.response.send_message(embed=embed)
 
+##########################################
+##########################################
+##########################################
+# Arcade Commands
+##########################################
+##########################################
+##########################################
+@bot.tree.command(name='arcade', description='Displays the game options in the arcade.')
+async def arcade(interaction: discord.Interaction):
+    rules_channel = bot.get_channel(821757961830793239)
+    embed = Rules.get_rules_embed(rules_channel)
+    await interaction.response.send_message(embed=embed)
+
 # Starts the TamoBot
 bot.run(TamoSecrets.get_token())
+
+
