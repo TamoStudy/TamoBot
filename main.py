@@ -27,6 +27,8 @@ from apps.info.help import Help
 from apps.info.rules import Rules
 from apps.info.stats import Stats
 
+from apps.arcade.arcade import Arcade
+
 # Initialize TamoBot and related connections
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
@@ -218,8 +220,7 @@ async def rules(interaction: discord.Interaction):
 ##########################################
 @bot.tree.command(name='arcade', description='Displays the game options in the arcade.')
 async def arcade(interaction: discord.Interaction):
-    rules_channel = bot.get_channel(821757961830793239)
-    embed = Rules.get_rules_embed(rules_channel)
+    embed = Arcade.show_arcade_options()
     await interaction.response.send_message(embed=embed)
 
 # Starts the TamoBot
