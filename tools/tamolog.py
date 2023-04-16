@@ -18,4 +18,4 @@ class TamoLogger():
             level_color = '\033[32m'
 
         # Print Message
-        print(f"\033[33m{formatted_time}{RESET} {level_color}{level}{RESET} {message}")
+        print(f"\033[33m{formatted_time}{RESET} {level_color}{level}{RESET}\t {message}")

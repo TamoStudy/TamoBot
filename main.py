@@ -32,7 +32,9 @@ from apps.arcade.arcade import Arcade
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
 db = MySQLConnection(TamoSecrets.get_db_database())
+TamoLogger.log("INFO", f"db successfully initialized in main: {db}")
 time_tracker = TimeTrack(db)
+stats_caller = Stats(db)
 
 """
 The on_ready event will trigger when the bot starts up
@@ -104,8 +106,8 @@ provided, the calling user is set as the user.
 """
 @bot.tree.command(name='stats', description='Displays the statistics of a user')
 async def stats(interaction: discord.Interaction, user: discord.User = None):
-    # TimeTrack.update_time_on_call(interaction, user)
-    embed = Stats.show_statistics(interaction, user)
+    time_tracker.update_time_on_call(interaction, user)
+    embed = stats_caller.show_statistics(interaction, user)
     await interaction.response.send_message(embed=embed)
 
 """

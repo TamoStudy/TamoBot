@@ -52,12 +52,23 @@ class MySQLConnection:
                 INSERT INTO user
                 (id, tokens, stime, zoneid, hex, trivia)
                 VALUES
-                ({user_id}, 0, 0, UTC, 383838, 0)
+                ({user_id}, 0, 0, \'UTC\', \'383838\', 0)
             '''
         cursor = self.connection.cursor()
         cursor.execute(sql)
         self.connection.commit()
         TamoLogger.log("INFO", f"Created new user with id {user_id}")
+
+    def create_user_if_dne(self, user_id):
+        """
+        Ensures that the user exists in the database, creates user if they do not.
+
+        Args
+            user_id (int) : discord ID of user to create / lookup
+        """
+        if self.fetch_user_by_id(user_id) is None:
+            TamoLogger.log("INFO", f"User ID {user_id} does not exist in user table. Calling create_user.")
+            self.create_user(user_id)
 
     def create_user_monthtime_entry(self, user_id):
         """
@@ -83,6 +94,15 @@ class MySQLConnection:
         self.connection.commit()
         TamoLogger.log("INFO", f"Created monthtime entry for user {user_id} for month {current_month} and year {current_year}")
 
+    def create_user_monthtime_entry_if_dne(self, user_id):
+        now_utc = datetime.datetime.utcnow()    # Normalize to UTC
+        current_month = now_utc.month           # Integer value of month
+        current_year = now_utc.year             # Integer value of year
+
+        if self.fetch_month_time_of_user(user_id, current_month, current_year) is None:
+            TamoLogger.log("INFO", f"User ID {user_id} does not have monthtime in monthtime table. Calling create_monthtime.")
+            self.create_user_monthtime_entry(user_id)
+
     def create_user_dailytime_entry(self, user_id):
         """
         Creates a user monthtime entry in the database.
@@ -106,7 +126,22 @@ class MySQLConnection:
         cursor = self.connection.cursor()
         cursor.execute(sql)
         self.connection.commit()
-        TamoLogger.log("INFO", f"Created monthtime entry for user {user_id} for month {current_month} and year {current_year}")
+        TamoLogger.log("INFO", f"Created dailytime entry for user {user_id} for month {current_month} and year {current_year}")
+
+    def create_user_dailytime_entry_if_dne(self, user_id):
+        now_utc = datetime.datetime.utcnow()    # Normalize to UTC
+        current_day = now_utc.day               # Integer value of day
+        current_month = now_utc.month           # Integer value of month
+        current_year = now_utc.year             # Integer value of year
+
+        if self.fetch_daily_time_of_user(user_id, current_day, current_month, current_year) is None:
+            TamoLogger.log("INFO", f"User ID {user_id} does not have dailytime in dailytime table. Calling create_dailytime.")
+            self.create_user_dailytime_entry(user_id)
+
+    def create_user_requirements_if_dne(self, user_id):
+        self.create_user_if_dne(user_id)
+        self.create_user_monthtime_entry_if_dne(user_id)
+        self.create_user_dailytime_entry_if_dne(user_id)
 
     ##########################################
     ##########################################
@@ -116,7 +151,7 @@ class MySQLConnection:
     ##########################################
     ##########################################
 
-    def fetch_user_profile_by_id(self, user_id: int):
+    def fetch_user_by_id(self, user_id: int):
         """
         Fetches a user by their ID from the database.
 
@@ -238,77 +273,50 @@ class MySQLConnection:
             return None
 
         return result[0]
-    
-    def fetch_profile_by_id(self, user_id):
-        """
-        Fetch the user's monthtime.stime, along with the rank of the 
-        user's monthtime.stime. That is, compare it against all of 
-        the other users in the database and obtain a position ranking (int).
-        """
 
+    def fetch_simple_stats_profile_by_id(self, user_id):
+        """
+        Simple fetch user, this will display
+        - monthly time
+        - user stime
+        - tamo tokens
+        - trivia wins
+        - daily time
+        """
+        # Fetch User
         cursor = self.connection.cursor()
-        sql = f"SELECT stime FROM monthtime WHERE user_id={user_id} ORDER BY stime DESC"
-        cursor.execute(sql)
-        month_stime = cursor.fetchone()[0] if cursor.rowcount > 0 else None
+        query = f'SELECT stime, tokens, trivia FROM user WHERE id = {user_id}'
+        cursor.execute(query)
+        user_result = cursor.fetchone()
 
-        if month_stime is None:
-            month_rank = None
-        else:
-            sql = f"SELECT COUNT(*)+1 FROM monthtime WHERE stime>{month_stime}"
-            cursor.execute(sql)
-            month_rank = cursor.fetchone()[0]
+        stime = user_result[0]
+        tokens = user_result[1]
+        trivia = user_result[2]
 
-        """
-        Fetch the user's stime, along with the rank of the 
-        user's stime. Similarly, compare it against all of 
-        the other users in the database and obtain a position ranking (int).
-        """
+        now_utc = datetime.datetime.utcnow()            # Normalize to UTC
+        current_day = now_utc.day                       # Integer value of day
+        current_month = now_utc.month                   # Integer value of month
+        current_year = now_utc.year                     # Integer value of year
+        self.create_user_requirements_if_dne(user_id)   # Special Check
 
-        sql = f"SELECT stime FROM user ORDER BY stime DESC"
-        cursor.execute(sql)
-        user_stime = None
-        user_rank = None
-        for rank, row in enumerate(cursor):
-            if row[0] is None:
-                break
-            if row[1] == user_id:
-                user_stime = row[0]
-                user_rank = rank+1
-                break
+        # Fetch Month Time
+        query = f'SELECT stime FROM monthtime WHERE user_id={user_id} AND mth={current_month} AND yr={current_year}'
+        cursor.execute(query)
+        month_time = cursor.fetchone()[0]
 
-        """
-        Fetch for user.tokens
-        """
+        # Fetch Daily Time
+        query = f'SELECT stime FROM dailytime WHERE user_id={user_id} AND d={current_day} AND mth={current_month} AND yr={current_year}'
+        cursor.execute(query)
+        daily_time = cursor.fetchone()[0]
 
-        sql = f"SELECT tokens FROM user WHERE id={user_id}"
-        cursor.execute(sql)
-        user_tokens = cursor.fetchone()[0]
+        return (daily_time, month_time, stime, tokens, trivia)
+    
+    def fetch_hex_code_by_id(self, user_id):
+        cursor = self.connection.cursor()
+        query = f'SELECT hex FROM user WHERE id={user_id}'
+        cursor.execute(query)
+        return cursor.fetchone()[0]
 
-        """
-        Fetch for user.trivia, along with the rank of the user's trivia.
-        Similarly, compare it against all of the other users in the database
-        and obtain a position ranking (int)
-        """
-
-        sql = f"SELECT trivia FROM user ORDER BY trivia DESC"
-        cursor.execute(sql)
-        user_trivia = None
-        trivia_rank = None
-        for rank, row in enumerate(cursor):
-            if row[0] is None:
-                break
-            if row[1] == user_id:
-                user_trivia = row[0]
-                trivia_rank = rank+1
-                break
-
-        """
-        Finally, return the following information:
-
-        (month rank, monthtime.stime, focus rank, user.stime, user.tokens, trivia rank, user.trivia)
-        """
-
-        return (month_rank, month_stime, user_rank, user_stime, user_tokens, trivia_rank, user_trivia)
 
     ##########################################
     ##########################################
