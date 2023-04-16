@@ -23,12 +23,38 @@ class TimeTrack():
             TamoLogger.loga("ERROR", "TimeTrack.start_up(guild)", f"An unexpected error occurred when fetching voice channels from guild. {e}")
 
         for channel in voice_channels:
-            if channel.id in FOCUS_ROOMS:
+            if isinstance(channel, discord.VoiceChannel) and channel.id in FOCUS_ROOMS:
                 members = channel.members
                 for member in members:
                     TamoLogger.loga("INFO", "TimeTrack.start_up(guild)", f"{member.name} was in {channel.name} on bot startup. Starting time.")
                     user_time[member.id] = time.time()
                     self.db.create_user_requirements_if_dne(member.id)
+
+    def handle_shutdown(self, guild: discord.Guild):
+        try:
+            voice_channels = guild.voice_channels
+            TamoLogger.loga("INFO", "TimeTrack.start_up(guild)", f"Successfully obtained voice channels from guild {voice_channels}.")
+        except Exception as e:
+            TamoLogger.loga("ERROR", "TimeTrack.start_up(guild)", f"An unexpected error occurred when fetching voice channels from guild. {e}")
+
+        for channel in voice_channels:
+            if isinstance(channel, discord.VoiceChannel) and channel.id in FOCUS_ROOMS:
+                members = channel.members
+                for member in members:
+                    if member.id in user_time:
+                        if member.id in called_stats_time and member.id in called_stats_tokens:
+                            subtract_time = called_stats_time[member.id]
+                            subtract_tokens = called_stats_tokens[member.id]
+                        else:
+                            subtract_time = 0
+                            subtract_tokens = 0
+
+                        focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
+                        tamo_tokens_earned = (focused_time_of_member // 144) - subtract_tokens
+
+                        # Update MySQL User Entry
+                        self.update_user_time_and_tokens_entry_in_database(member.id, focused_time_of_member, tamo_tokens_earned)
+                        TamoLogger.loga("SUCCESS", "TimeTrack.handle_shutdown", f"Member {member.name} time saved {focused_time_of_member}, earned {tamo_tokens_earned} tokens.")
 
     def update_time_on_event(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         TamoLogger.log("INFO", f"Update Time Event Received in Time Track. Current user_time {user_time}")
