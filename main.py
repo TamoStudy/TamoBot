@@ -60,6 +60,7 @@ async def on_ready():
             await guild.leave()
         else:
             TamoLogger.log("INFO", f'{bot.user} is connected to {guild.name} (id: {guild.id})')
+            time_tracker.start_up(guild)
 
     # Set status message
     await bot.change_presence(activity=discord.Game(name="/help | tamostudy.com"))

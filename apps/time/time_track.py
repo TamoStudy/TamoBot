@@ -13,7 +13,22 @@ called_stats_tokens = {}
 class TimeTrack():
     def __init__(self, db: MySQLConnection):
         self.db = db
-        TamoLogger.log("INFO", f"db successfully initialized in time_track: {db}")
+        TamoLogger.log("INFO", "TimeTrack.__init__(db)", f"db successfully initialized in time_track: {db}")
+
+    def start_up(self, guild: discord.Guild):
+        try:
+            voice_channels = guild.voice_channels
+            TamoLogger.loga("INFO", "TimeTrack.start_up(guild)", f"Successfully obtained voice channels from guild {voice_channels}.")
+        except Exception as e:
+            TamoLogger.loga("ERROR", "TimeTrack.start_up(guild)", f"An unexpected error occurred when fetching voice channels from guild. {e}")
+
+        for channel in voice_channels:
+            if channel.id in FOCUS_ROOMS:
+                members = channel.members
+                for member in members:
+                    TamoLogger.loga("INFO", "TimeTrack.start_up(guild)", f"{member.name} was in {channel.name} on bot startup. Starting time.")
+                    user_time[member.id] = time.time()
+                    self.db.create_user_requirements_if_dne(member.id)
 
     def update_time_on_event(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         TamoLogger.log("INFO", f"Update Time Event Received in Time Track. Current user_time {user_time}")
