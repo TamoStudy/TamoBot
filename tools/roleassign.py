@@ -19,7 +19,7 @@ class RoleAssign():
     def __init__(self, db: MySQLConnection):
         self.db = db
 
-    async def check_role_updates_on_user(self, user: discord.Member, guild: discord.Guild):
+    async def check_role_updates_on_user(self, member: discord.Member, guild: discord.Guild = None):
         if guild.id not in ROLE_IDS:
             TamoLogger.log("WARN", f"Called guild {guild.id} does not exist in ROLE_IDS. Skipping update roles.")
             return
@@ -35,46 +35,46 @@ class RoleAssign():
         now_utc = datetime.datetime.utcnow()    # Normalize to UTC
         current_month = now_utc.month           # Integer value of month
         current_year = now_utc.year             # Integer value of year
-        month_time = await self.db.fetch_month_time_of_user(user.id, current_month, current_year)
+        month_time = await self.db.fetch_month_time_of_user(member.id, current_month, current_year)
 
         if month_time < 1:
             # Remove all Level Roles
-            await user.remove_roles(level_one_role, level_two_role, level_three_role, level_four_role, level_five_role, level_six_role)
-            TamoLogger.log("INFO", f"Ensuring {user.name} does not have a level role.")
+            await member.remove_roles(level_one_role, level_two_role, level_three_role, level_four_role, level_five_role, level_six_role)
+            TamoLogger.log("INFO", f"Ensuring {member.name} does not have a level role.")
         elif month_time >= 1 and month_time < 10:
             # Assign Level 1 Role, unless user already has it, deassign other roles
-            if level_one_role not in user.roles:
-                await user.add_roles(level_one_role)
-                await user.remove_roles(level_two_role, level_three_role, level_four_role, level_five_role, level_six_role)
-                TamoLogger.log("INFO", f"Assigning {user.name} level one role.")
+            if level_one_role not in member.roles:
+                await member.add_roles(level_one_role)
+                await member.remove_roles(level_two_role, level_three_role, level_four_role, level_five_role, level_six_role)
+                TamoLogger.log("INFO", f"Assigning {member.name} level one role.")
         elif month_time >= 10 and month_time < 25:
             # Assign Level 2 Role, unless user already has it, deassign other roles
-            if level_two_role not in user.roles:
-                await user.add_roles(level_two_role)
-                await user.remove_roles(level_one_role, level_three_role, level_four_role, level_five_role, level_six_role)
-                TamoLogger.log("INFO", f"Assigning {user.name} level two role.")
+            if level_two_role not in member.roles:
+                await member.add_roles(level_two_role)
+                await member.remove_roles(level_one_role, level_three_role, level_four_role, level_five_role, level_six_role)
+                TamoLogger.log("INFO", f"Assigning {member.name} level two role.")
         elif month_time >= 25 and month_time < 60:
             # Assign Level 3 Role, unless user already has it, deassign other roles
-            if level_three_role not in user.roles:
-                await user.add_roles(level_three_role)
-                await user.remove_roles(level_one_role, level_two_role, level_four_role, level_five_role, level_six_role)
-                TamoLogger.log("INFO", f"Assigning {user.name} level three role.")
+            if level_three_role not in member.roles:
+                await member.add_roles(level_three_role)
+                await member.remove_roles(level_one_role, level_two_role, level_four_role, level_five_role, level_six_role)
+                TamoLogger.log("INFO", f"Assigning {member.name} level three role.")
         elif month_time >= 60 and month_time < 100:
             # Assign Level 4 Role, unless user already has it, deassign other roles
-            if level_four_role not in user.roles:
-                await user.add_roles(level_four_role)
-                await user.remove_roles(level_one_role, level_two_role, level_three_role, level_five_role, level_six_role)
-                TamoLogger.log("INFO", f"Assigning {user.name} level four role.")
+            if level_four_role not in member.roles:
+                await member.add_roles(level_four_role)
+                await member.remove_roles(level_one_role, level_two_role, level_three_role, level_five_role, level_six_role)
+                TamoLogger.log("INFO", f"Assigning {member.name} level four role.")
         elif month_time >= 100 and month_time < 250:
             # Assign Level 5 Role, unless user already has it, deassign other roles
-            if level_five_role not in user.roles:
-                await user.add_roles(level_five_role)
-                await user.remove_roles(level_one_role, level_two_role, level_three_role, level_four_role, level_six_role)
-                TamoLogger.log("INFO", f"Assigning {user.name} level five role.")
+            if level_five_role not in member.roles:
+                await member.add_roles(level_five_role)
+                await member.remove_roles(level_one_role, level_two_role, level_three_role, level_four_role, level_six_role)
+                TamoLogger.log("INFO", f"Assigning {member.name} level five role.")
         elif month_time >= 250:
             # Assign Level 6 Role, unless user already has it, deassign other roles
-            if level_six_role not in user.roles:
-                await user.add_roles(level_six_role)
-                await user.remove_roles(level_one_role, level_two_role, level_three_role, level_four_role, level_five_role)
-                TamoLogger.log("INFO", f"Assigning {user.name} level six role.")
+            if level_six_role not in member.roles:
+                await member.add_roles(level_six_role)
+                await member.remove_roles(level_one_role, level_two_role, level_three_role, level_four_role, level_five_role)
+                TamoLogger.log("INFO", f"Assigning {member.name} level six role.")
 

@@ -124,26 +124,25 @@ async def shutdown(ctx: commands.Context):
 ##########################################
 
 @bot.event
-async def on_voice_state_update(interaction: discord.Interaction, before: discord.VoiceState, after: discord.VoiceState):
+async def on_voice_state_update(member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
     """
     on_voice_state_update
 
     TamoBot will first update time tracking for the member based off of received voice states. (via TimeTracker)
     Then, TamoBot will assign level roles according to the user's current month time. (via RoleAssign)
     """
-    try:
-        TamoLogger.loga("INFO", "main.on_voice_state_update", f"Attempting to get member and guild from incoming interaction")
-        member = interaction.guild.get_member(interaction.user.id)
-        guild = interaction.guild
-    except Exception as e:
-        TamoLogger.loga("ERROR", "main.on_voice_state_update", f"Error obtaining member and guild from incoming interaction. {e}")
-    
+    # try:
+    TamoLogger.loga("INFO", "main.on_voice_state_update", f"Attempting to get member and guild from incoming interaction {member}")
+    guild = None # TODO
+
     TamoLogger.log("INFO", f"Voice State Update received by {member.name} in guild {guild.name}")
     time_tracker.update_time_on_event(member, before, after)
     role_assign.check_role_updates_on_user(member, guild)
+    # except Exception as e:
+    #     TamoLogger.loga("ERROR", "main.on_voice_state_update", f"Error obtaining member and guild from incoming interaction. {e}")
 
 @bot.tree.command(name='stats', description='Displays the statistics of a user')
-async def stats(interaction: discord.Interaction, user: discord.Member = None):
+async def stats(interaction: discord.Interaction, member: discord.Member = None):
     """
     /stats [user]
 
@@ -151,15 +150,17 @@ async def stats(interaction: discord.Interaction, user: discord.Member = None):
     provided, the calling user is set as the user.
     """
     try:
-        time_tracker.update_time_on_call(interaction, user)
 
         TamoLogger.loga("INFO", "main.stats", f"Attempting to get member and guild from incoming interaction")
-        member = interaction.guild.get_member(interaction.user.id)
+        if member is None:
+            member = interaction.guild.get_member(interaction.user.id)
+
+        time_tracker.update_time_on_call(interaction, member)
         guild = interaction.guild
 
         role_assign.check_role_updates_on_user(member, guild)
 
-        embed = stats_caller.show_statistics(interaction, user)
+        embed = stats_caller.show_statistics(interaction, member)
         await interaction.response.send_message(embed=embed)
     except Exception as e:
         TamoLogger.loga("ERROR", "main.stats", f"Error obtaining member and guild from incoming interaction. {e}")
