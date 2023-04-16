@@ -107,7 +107,7 @@ async def shutdown(ctx: commands.Context):
     guild = ctx.guild
     user_has_role = discord.utils.get(ctx.author.roles, id=934885581614350348) is not None
     if user_has_role:
-        await time_tracker.handle_shutdown(guild)
+        time_tracker.handle_shutdown(guild)
         await ctx.send("Shutting down...")
         await bot.close()
         TamoLogger.loga("SUCCESS", "main.shutdown", f"TamoBot Close Successful")
@@ -133,11 +133,11 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
     """
     # try:
     TamoLogger.loga("INFO", "main.on_voice_state_update", f"Attempting to get member and guild from incoming interaction {member}")
-    guild = None # TODO
+    guild = member.guild
 
     TamoLogger.log("INFO", f"Voice State Update received by {member.name} in guild {guild.name}")
     time_tracker.update_time_on_event(member, before, after)
-    role_assign.check_role_updates_on_user(member, guild)
+    await role_assign.check_role_updates_on_user(member, guild)
     # except Exception as e:
     #     TamoLogger.loga("ERROR", "main.on_voice_state_update", f"Error obtaining member and guild from incoming interaction. {e}")
 
@@ -158,7 +158,7 @@ async def stats(interaction: discord.Interaction, member: discord.Member = None)
         time_tracker.update_time_on_call(interaction, member)
         guild = interaction.guild
 
-        role_assign.check_role_updates_on_user(member, guild)
+        await role_assign.check_role_updates_on_user(member, guild)
 
         embed = stats_caller.show_statistics(interaction, member)
         await interaction.response.send_message(embed=embed)

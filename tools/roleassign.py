@@ -25,17 +25,17 @@ class RoleAssign():
             return
 
         # Get Level Roles for Server
-        level_one_role = discord.utils.get(guild.roles, id=ROLE_IDS[guild.id][0])
-        level_two_role = discord.utils.get(guild.roles, id=ROLE_IDS[guild.id][1])
-        level_three_role = discord.utils.get(guild.roles, id=ROLE_IDS[guild.id][2])
-        level_four_role = discord.utils.get(guild.roles, id=ROLE_IDS[guild.id][3])
-        level_five_role = discord.utils.get(guild.roles, id=ROLE_IDS[guild.id][4])
-        level_six_role = discord.utils.get(guild.roles, id=ROLE_IDS[guild.id][5])
+        level_one_role = discord.utils.get(guild.roles, id=1093186890393469008)
+        level_two_role = discord.utils.get(guild.roles, id=1093186982257115177)
+        level_three_role = discord.utils.get(guild.roles, id=1093187032718770279)
+        level_four_role = discord.utils.get(guild.roles, id=1093187089371246663)
+        level_five_role = discord.utils.get(guild.roles, id=1093187142848618576)
+        level_six_role = discord.utils.get(guild.roles, id=1093187217544982540)
 
         now_utc = datetime.datetime.utcnow()    # Normalize to UTC
         current_month = now_utc.month           # Integer value of month
         current_year = now_utc.year             # Integer value of year
-        month_time = await self.db.fetch_month_time_of_user(member.id, current_month, current_year)
+        month_time = (self.db.fetch_month_time_of_user(member.id, current_month, current_year)) // 3600
 
         if month_time < 1:
             # Remove all Level Roles
