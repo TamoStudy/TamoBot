@@ -7,6 +7,7 @@ Contains standard pattern for Discord Bot creation utilizing discord.py
 """
 # Required imports
 import discord
+import re
 from tools.tamolog import TamoLogger
 from sql.mysqlconnection import MySQLConnection
 from discord.ext import commands
@@ -175,9 +176,23 @@ async def top(interaction: discord.Interaction):
 Displays the current server shop options.
 """
 @bot.tree.command(name='shop', description='View the shop listings.')
-async def shop(interaction: discord.Interaction, shop: str = None):
+async def shop(interaction: discord.Interaction):
     embed = Shop.show_shop_options()
     await interaction.response.send_message(embed=embed)
+
+"""
+/shopembed [hex]
+
+User calls the command to purchase the embed to add to their profile
+"""
+@bot.tree.command(name='shopembed', description='Use 1000 Tamo tokens to change the color of your profile embed.')
+async def shop(interaction: discord.Interaction, hex: str = None):
+    if hex and re.match(r'^[0-9a-fA-F]{6}$', hex):
+        embed = Shop.show_shop_options()
+        await interaction.response.send_message(embed=embed)
+    else:
+        interaction.response.send_message(f"{interaction.user.mention}, please provide a correct hex code. Example: `FFFFFF` (white).")
+    
 
 ##########################################
 ##########################################

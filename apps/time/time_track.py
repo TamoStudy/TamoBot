@@ -13,7 +13,7 @@ called_stats_tokens = {}
 class TimeTrack():
     def __init__(self, db: MySQLConnection):
         self.db = db
-        TamoLogger.log("INFO", "TimeTrack.__init__(db)", f"db successfully initialized in time_track: {db}")
+        TamoLogger.loga("INFO", "TimeTrack.__init__(db)", f"db successfully initialized in time_track: {db}")
 
     def start_up(self, guild: discord.Guild):
         try:

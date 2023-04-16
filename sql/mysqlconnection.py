@@ -316,7 +316,12 @@ class MySQLConnection:
         query = f'SELECT hex FROM user WHERE id={user_id}'
         cursor.execute(query)
         return cursor.fetchone()[0]
-
+    
+    def fetch_tokens_by_id(self, user_id):
+        cursor = self.connection.cursor()
+        query = f'SELECT tokens FROM user WHERE id={user_id}'
+        cursor.execute(query)
+        return cursor.fetchone()[0]
 
     ##########################################
     ##########################################
@@ -383,6 +388,12 @@ class MySQLConnection:
         query = "UPDATE user SET feat=%s WHERE id=%s"
         values = (feat, user_id)
         cursor.execute(query, values)
+        self.connection.commit()
+
+    def update_subtract_user_tokens(self, user_id, tokens):
+        cursor = self.connection.cursor()
+        query = f"UPDATE user SET tokens = tokens - {tokens} WHERE id = {user_id}"
+        cursor.execute(query)
         self.connection.commit()
 
     ##########################################
