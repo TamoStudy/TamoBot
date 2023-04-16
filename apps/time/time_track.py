@@ -1,5 +1,6 @@
 import discord
 import time
+import traceback
 
 from sql.mysqlconnection import MySQLConnection
 from tools.tamolog import TamoLogger
@@ -15,6 +16,10 @@ class TimeTrack():
         TamoLogger.log("INFO", f"db successfully initialized in time_track: {db}")
 
     def update_time_on_event(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+        TamoLogger.log("INFO", f"Update Time Event Received in Time Track. Current user_time {user_time}")
+        TamoLogger.log("INFO", f"Current called_stats_time: {called_stats_time}")
+        TamoLogger.log("INFO", f"Current called_stats_time: {called_stats_tokens}")
+
         # Event when joining a focus room
         if member.id not in user_time and (before.channel is None or before.channel not in FOCUS_ROOMS) and (after.channel is not None and after.channel.id in FOCUS_ROOMS):
             """
@@ -35,20 +40,18 @@ class TimeTrack():
             """
             try:
                 # If the user call /stats or was caller for stats, subtract added time
-                if member.id in called_stats_time:
+                if member.id in called_stats_time and member.id in called_stats_tokens:
                     subtract_time = called_stats_time[member.id]
+                    subtract_tokens = called_stats_tokens[member.id]
+                    del called_stats_time[member.id]
+                    del called_stats_tokens[member.id]
                 else:
                     subtract_time = 0
-
-                focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
-
-                # If the user called /stats or was caller for stats, subtract added tokens
-                if member.id in called_stats_tokens:
-                    subtract_tokens = called_stats_tokens[member.id]
-                else:
                     subtract_tokens = 0
 
+                focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
                 tamo_tokens_earned = (focused_time_of_member // 144) - subtract_tokens
+
                 TamoLogger.log("INFO", str(member.name) + " left " + str(before.channel.name) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
                 del user_time[member.id]
 
@@ -56,8 +59,9 @@ class TimeTrack():
                 self.update_user_time_and_tokens_entry_in_database(member.id, focused_time_of_member, tamo_tokens_earned)
             except KeyError as e:
                 TamoLogger.log("ERROR", f"KeyError occurred when accessing user_time. Invalid Key: {e.args[0]}")
-            except:
-                TamoLogger.log("ERROR", "An unexpected error occurred inside of TimeTrack.update_time_on_event.")
+            except Exception as e:
+                TamoLogger.log("ERROR", f"An unexpected error occurred inside of TimeTrack.update_time_on_event for {member.name}.")
+                traceback.print_exc()
 
     def update_time_on_call(self, interaction: discord.Interaction, user: discord.User):
         """
