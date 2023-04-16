@@ -1,6 +1,8 @@
 import mysql.connector
 import datetime
 
+from typing import List
+
 from sql.model.dbUser import DBUser
 from sql.model.dbMonthTime import DBMonthTime
 from sql.model.dbDailyTime import DBDailyTime
@@ -171,7 +173,7 @@ class MySQLConnection:
 
         return DBUser(*result)
 
-    def fetch_top_3_stime_users(self):
+    def fetch_top_3_stime_users(self) -> List[DBUser]:
         """
         Fetches the top 3 users with the highest stime values from the user table.
 
@@ -188,7 +190,7 @@ class MySQLConnection:
             top_users.append(user)
         return top_users
 
-    def fetch_top_3_stime_monthly_users(self):
+    def fetch_top_3_stime_monthly_users(self) -> List[DBUser]:
         """
         Fetches the top 3 users with the highest monthly stime from the monthtime table.
 

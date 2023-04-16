@@ -8,7 +8,10 @@ Contains standard pattern for Discord Bot creation utilizing discord.py
 # Required imports
 import discord
 import re
+
 from tools.tamolog import TamoLogger
+from tools.errorembed import ErrorEmbed
+
 from sql.mysqlconnection import MySQLConnection
 from discord.ext import commands
 from tamo_secrets import TamoSecrets
@@ -34,33 +37,34 @@ from apps.arcade.arcade import Arcade
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
 db = MySQLConnection(TamoSecrets.get_db_database())
-TamoLogger.log("INFO", f"db successfully initialized in main: {db}")
+TamoLogger.loga("INFO", "main", f"db successfully initialized in main: {db}")
 
 time_tracker = TimeTrack(db)
 role_assign = RoleAssign(db)
 stats_caller = Stats(db)
 
-"""
-The on_ready event will trigger when the bot starts up
-
-1. Connects to the Tamo database.
-2. Ensures that the TamoBot is only connected to allowed servers.
-3. Sets the status of the TamoBot.
-4. Syncs the slash commands.
-"""
 @bot.event
 async def on_ready():
+    """
+    The on_ready event will trigger when the bot starts up
+
+    1. Connects to the Tamo database.
+    2. Ensures that the TamoBot is only connected to allowed servers.
+    3. Sets the status of the TamoBot.
+    4. Syncs the slash commands.
+    """
+
     # Connect to mySQL database
     db.connect()
 
     # bot is only allowed on allowed servers
-    TamoLogger.log("SUCCESS", f'{bot.user} has connected to Discord!')
+    TamoLogger.loga("SUCCESS", "main.on_ready", f'{bot.user} has connected to Discord!')
     for guild in bot.guilds:
         if guild.id != allowed_server:
-            TamoLogger.log("WARN", f'{bot.user} leaving unauthorized server {guild.name} (id: {guild.id})')
+            TamoLogger.loga("WARN", "main.on_ready", f'{bot.user} leaving unauthorized server {guild.name} (id: {guild.id})')
             await guild.leave()
         else:
-            TamoLogger.log("INFO", f'{bot.user} is connected to {guild.name} (id: {guild.id})')
+            TamoLogger.loga("INFO", "main.on_ready", f'{bot.user} is connected to {guild.name} (id: {guild.id})')
             time_tracker.start_up(guild)
 
     # Set status message
@@ -68,45 +72,48 @@ async def on_ready():
 
     # Sync commands
     synced = await bot.tree.sync()
-    TamoLogger.log('INFO', 'TamoBot Slash Commands Synced: ' + str(len(synced)))
+    TamoLogger.loga('INFO', "main.on_ready", 'TamoBot Slash Commands Synced: ' + str(len(synced)))
 
     # Indicate on_ready is complete
-    TamoLogger.log('SUCCESS', 'TamoBot is officially ready for use!')
+    TamoLogger.loga('SUCCESS', "main.on_ready", 'TamoBot is officially ready for use!')
 
-"""
-The on_guild_join functionality is used to ensure that the TamoBot
-only joins servers that is has been assigned to join.
-
-The TamoBot will leave servers that it has not been assigned to join.
-"""
 @bot.event
 async def on_guild_join(guild):
+    """
+    The on_guild_join functionality is used to ensure that the TamoBot
+    only joins servers that is has been assigned to join.
+
+    The TamoBot will leave servers that it has not been assigned to join.
+    """
     guild_id = guild.id
-    TamoLogger.log("INFO", f"Joined guild with ID: {guild_id}")
+    TamoLogger.loga("INFO", "main.on_guild_join", f"Joined guild with ID: {guild_id}")
 
     if guild.id != allowed_server:
         await guild.leave()
-        TamoLogger.log("WARN", f"Bot removed from unauthorized server: {guild.name}")
+        TamoLogger.loga("WARN", "main.on_guild_join", f"Bot removed from unauthorized server: {guild.name}")
     else:
-        TamoLogger.log("INFO", f"Bot joined authorized server: {guild.name}")
+        TamoLogger.loga("INFO", "main.on_guild_join", f"Bot joined authorized server: {guild.name}")
 
-"""
-$shutdown
-
-A traditional context command for administrator use only.
-This will shut the bot down at any given time.
-This command acts as a 'safe' shut down.
-"""
 @bot.command(name='shutdown')
 async def shutdown(ctx: commands.Context):
+    """
+    $shutdown
+
+    A traditional context command for administrator use only.
+    This will shut the bot down at any given time.
+    This command acts as a 'safe' shut down.
+    """
+    TamoLogger.loga("INFO", "main.shutdown", f"Received shutdown command from {ctx.author.name}")
     guild = ctx.guild
     user_has_role = discord.utils.get(ctx.author.roles, id=934885581614350348) is not None
     if user_has_role:
         await time_tracker.handle_shutdown(guild)
         await ctx.send("Shutting down...")
         await bot.close()
+        TamoLogger.loga("SUCCESS", "main.shutdown", f"TamoBot Close Successful")
     else:
         await ctx.send("LOL! :rofl:")
+        TamoLogger.loga("WARN", "main.shutdown", f"Shutdown attempt failure. User has inproper permissions.")
 
 ##########################################
 ##########################################
@@ -118,6 +125,12 @@ async def shutdown(ctx: commands.Context):
 
 @bot.event
 async def on_voice_state_update(interaction: discord.Interaction, before: discord.VoiceState, after: discord.VoiceState):
+    """
+    on_voice_state_update
+
+    TamoBot will first update time tracking for the member based off of received voice states. (via TimeTracker)
+    Then, TamoBot will assign level roles according to the user's current month time. (via RoleAssign)
+    """
     try:
         TamoLogger.loga("INFO", "main.on_voice_state_update", f"Attempting to get member and guild from incoming interaction")
         member = interaction.guild.get_member(interaction.user.id)
@@ -129,37 +142,38 @@ async def on_voice_state_update(interaction: discord.Interaction, before: discor
     time_tracker.update_time_on_event(member, before, after)
     role_assign.check_role_updates_on_user(member, guild)
 
-"""
-/stats [user]
-
-Displays the TamoBot statistics of the specified user. If no user is
-provided, the calling user is set as the user.
-"""
 @bot.tree.command(name='stats', description='Displays the statistics of a user')
 async def stats(interaction: discord.Interaction, user: discord.Member = None):
-    time_tracker.update_time_on_call(interaction, user)
-    
+    """
+    /stats [user]
+
+    Displays the TamoBot statistics of the specified user. If no user is
+    provided, the calling user is set as the user.
+    """
     try:
+        time_tracker.update_time_on_call(interaction, user)
+
         TamoLogger.loga("INFO", "main.stats", f"Attempting to get member and guild from incoming interaction")
         member = interaction.guild.get_member(interaction.user.id)
         guild = interaction.guild
+
+        role_assign.check_role_updates_on_user(member, guild)
+
+        embed = stats_caller.show_statistics(interaction, user)
+        await interaction.response.send_message(embed=embed)
     except Exception as e:
         TamoLogger.loga("ERROR", "main.stats", f"Error obtaining member and guild from incoming interaction. {e}")
+        await interaction.response.send_message(embed=ErrorEmbed.message("Unexpected error occurred."))
     
-    role_assign.check_role_updates_on_user(member, guild)
 
-    embed = stats_caller.show_statistics(interaction, user)
-    await interaction.response.send_message(embed=embed)
-
-"""
-/top
-
-Displays the top three focus leaders on the server.
-"""
 @bot.tree.command(name='top', description='View the current all time focus leaders')
 async def top(interaction: discord.Interaction):
-    # TODO Get top users from database, user1=, user2= ...
-    embed = Top.display_top(interaction)
+    """
+    /top
+
+    Displays the top three focus leaders on the server.
+    """
+    embed = top.display_top()
     await interaction.response.send_message(embed=embed)
 
 ##########################################
