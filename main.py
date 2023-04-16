@@ -89,6 +89,24 @@ async def on_guild_join(guild):
     else:
         TamoLogger.log("INFO", f"Bot joined authorized server: {guild.name}")
 
+"""
+$shutdown
+
+A traditional context command for administrator use only.
+This will shut the bot down at any given time.
+This command acts as a 'safe' shut down.
+"""
+@bot.command(name='shutdown')
+async def shutdown(ctx: commands.Context):
+    guild = ctx.guild
+    user_has_role = discord.utils.get(ctx.author.roles, id=934885581614350348) is not None
+    if user_has_role:
+        await time_tracker.handle_shutdown(guild)
+        await ctx.send("Shutting down...")
+        await bot.close()
+    else:
+        await ctx.send("LOL! :rofl:")
+
 ##########################################
 ##########################################
 ##########################################
