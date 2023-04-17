@@ -206,6 +206,7 @@ User calls the command to purchase the embed to add to their profile
 """
 @bot.tree.command(name='shopembed', description='Use 1000 Tamo tokens to change the color of your profile embed.')
 async def shop(interaction: discord.Interaction, hex: str = None):
+    time_tracker.update_time_on_call(interaction, interaction.user)
     if hex and re.match(r'^[0-9a-fA-F]{6}$', hex):
         embed = shopembed_app.purchase_embed(interaction.user.id, hex)
         await interaction.response.send_message(embed=embed)
@@ -219,6 +220,7 @@ async def shop(interaction: discord.Interaction, hex: str = None):
 @bot.tree.command(name='shopcolor', description='Use 500 Tamo tokens to change the color of your discord name!')
 async def shopcolor(interaction: discord.Interaction, color: str = None):
     TamoLogger.loga("INFO", "main.shopcolor", f"Shop Color Event Received by {interaction.user.name}. color = {color}")
+    time_tracker.update_time_on_call(interaction, interaction.user)
     if color is None:
         embed = shopcolor_app.show_color_shop(interaction)
         await interaction.response.send_message(embed=embed)
