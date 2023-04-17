@@ -226,7 +226,7 @@ async def shopcolor(interaction: discord.Interaction, color: str = None):
         try:
             purchase_number = int(color)
             if purchase_number >= 1 and purchase_number <= 16:
-                embed = shopcolor_app.purchase_color(interaction.user, interaction.guild, purchase_number)
+                embed = await shopcolor_app.purchase_color(interaction.user, interaction.guild, purchase_number)
                 await interaction.response.send_message(embed=embed)
             else:
                 embed = ErrorEmbed.message('Invalid color option was entered.\nEnter an integer between `1` and `16`.')
