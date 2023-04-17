@@ -7,7 +7,7 @@ class Help:
         """
         Returns the help discord embed
         """
-        embed = discord.Embed(title="TamoBot Help")
+        embed = discord.Embed(title="TamoBot Help", color=0xffa500)
         embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
         embed.add_field(name=':gear: General', value='**━━━━━━━━━━━━━━━**\n`/help`\n<:myemote:1097295903506829342> Get help! Oh wait, you\'re on this page right now.\n`/rules`\n<:myemote:1097295903506829342> View the server rules.\n`/roll [optional: max]`\n<:myemote:1097295903506829342>Randomly roll a number.\n`/8ball [question]`\n<:myemote:1097295903506829342> Ask the magic 8 ball a question.\n`/motivation [optional: user]`\n<:myemote:1097295903506829342> Get some motivation!\n**━━━━━━━━━━━━━━━**', inline=False)
         embed.add_field(name=':busts_in_silhouette: Profile & Time Tracking', value='**━━━━━━━━━━━━━━━**\n`/stats`\n<:myemote:1097295903506829342>View your TamoBot statistics.\n`/top`\n<:myemote:1097295903506829342>View the server focus leaderboard.\n**━━━━━━━━━━━━━━━**', inline=False)
