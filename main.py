@@ -22,6 +22,8 @@ from tools.roleassign import RoleAssign
 from apps.time.top import Top
 
 from apps.shop.shop import Shop
+from apps.shop.shopembed import ShopEmbed
+from apps.shop.shopcolor import ShopColor
 
 from apps.misc.eight_ball import EightBall
 from apps.misc.roll import Roll
@@ -42,6 +44,9 @@ TamoLogger.loga("INFO", "main", f"db successfully initialized in main: {db}")
 time_tracker = TimeTrack(db)
 role_assign = RoleAssign(db)
 stats_caller = Stats(db)
+top_app = Top(db)
+shopembed_app = ShopEmbed(db)
+shopcolor_app = ShopColor(db)
 
 @bot.event
 async def on_ready():
@@ -165,7 +170,6 @@ async def stats(interaction: discord.Interaction, member: discord.Member = None)
     except Exception as e:
         TamoLogger.loga("ERROR", "main.stats", f"Error obtaining member and guild from incoming interaction. {e}")
         await interaction.response.send_message(embed=ErrorEmbed.message("Unexpected error occurred."))
-    
 
 @bot.tree.command(name='top', description='View the current all time focus leaders')
 async def top(interaction: discord.Interaction):
@@ -174,7 +178,7 @@ async def top(interaction: discord.Interaction):
 
     Displays the top three focus leaders on the server.
     """
-    embed = top.display_top()
+    embed = top_app.display_top(interaction)
     await interaction.response.send_message(embed=embed)
 
 ##########################################
@@ -203,10 +207,30 @@ User calls the command to purchase the embed to add to their profile
 @bot.tree.command(name='shopembed', description='Use 1000 Tamo tokens to change the color of your profile embed.')
 async def shop(interaction: discord.Interaction, hex: str = None):
     if hex and re.match(r'^[0-9a-fA-F]{6}$', hex):
-        embed = Shop.show_shop_options()
+        embed = shopembed_app.purchase_embed(interaction.user.id, hex)
         await interaction.response.send_message(embed=embed)
     else:
-        interaction.response.send_message(f"{interaction.user.mention}, please provide a correct hex code. Example: `FFFFFF` (white).")
+        await interaction.response.send_message(f"{interaction.user.mention}, please provide a correct hex code. Example: `FFFFFF` (white).")
+    
+"""
+/shopcolor          : displays shop color options
+/shopcolor [option] : purchase color option
+"""
+@bot.tree.command(name='shopcolor', description='Use 500 Tamo tokens to change the color of your discord name!')
+async def shopcolor(interaction: discord.Interaction, color: str = None):
+    if str is None:
+        embed = shopcolor_app.show_color_shop(interaction)
+        await interaction.response.send_message(embed=embed)
+    else:
+        try:
+            purchase_number = int(color)
+            if 1 <= purchase_number <= 16:
+                raise Exception('Invalid entry')
+            embed = shopcolor_app.purchase_color(interaction, purchase_number)
+            await interaction.response.send_message(embed=embed)
+        except Exception as e:
+            embed = ErrorEmbed.message('Invalid color option was entered.\nEnter an integer between `1` and `16`.')
+            await interaction.response.send_message(embed=embed)
     
 
 ##########################################

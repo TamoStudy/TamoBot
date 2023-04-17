@@ -37,11 +37,11 @@ class RoleAssign():
         current_year = now_utc.year             # Integer value of year
         month_time = (self.db.fetch_month_time_of_user(member.id, current_month, current_year)) // 3600
 
-        if month_time < 1:
+        if month_time < 3:
             # Remove all Level Roles
             await member.remove_roles(level_one_role, level_two_role, level_three_role, level_four_role, level_five_role, level_six_role)
             TamoLogger.log("INFO", f"Ensuring {member.name} does not have a level role.")
-        elif month_time >= 1 and month_time < 10:
+        elif month_time >= 3 and month_time < 10:
             # Assign Level 1 Role, unless user already has it, deassign other roles
             if level_one_role not in member.roles:
                 await member.add_roles(level_one_role)

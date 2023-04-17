@@ -190,28 +190,35 @@ class MySQLConnection:
             top_users.append(user)
         return top_users
 
-    def fetch_top_3_stime_monthly_users(self) -> List[DBUser]:
+    def fetch_top_10_stime_monthly_users(self) -> List[DBUser]:
         """
-        Fetches the top 3 users with the highest monthly stime from the monthtime table.
+        Fetches the top 10 users with the highest monthly stime from the monthtime table.
 
         Returns:
             dict: A dictionary containing user objects mapped to their corresponding monthly stime
         """
+        TamoLogger.loga("INFO", "MySQLConnection.fetch_top_10_stime_monthly_users", f"Attempting fetching top 10 stime monthly users.")
+        now_utc = datetime.datetime.utcnow()    # Normalize to UTC
+        current_month = now_utc.month           # Integer value of month
+        current_year = now_utc.year             # Integer value of year
+        
         cursor = self.connection.cursor()
-        query = """
+        query = f"""
                 SELECT user_id, stime
                 FROM monthtime
+                WHERE yr = {current_year} AND mth = {current_month}
                 GROUP BY user_id
                 ORDER BY stime DESC
-                LIMIT 3
+                LIMIT 10;
                 """
         cursor.execute(query)
         results = cursor.fetchall()
-        top_users = {}
+        top_users = []
         for result in results:
             user_id, monthly_stime = result
-            user = self.fetch_user_by_id(user_id)
-            top_users[user_id] = (user, monthly_stime)
+            top_users.append( (user_id, monthly_stime) )
+        
+        TamoLogger.loga("INFO", "MySQLConnection.fetch_top_10_stime_monthly_users", f"Returning top 10 monthly users {top_users}.")
         return top_users
 
     def fetch_top_3_trivia_users(self):
@@ -393,8 +400,12 @@ class MySQLConnection:
         self.connection.commit()
 
     def update_subtract_user_tokens(self, user_id, tokens):
+        current_tokens = int(self.fetch_tokens_by_id(user_id))
+        updated_tokens = int(current_tokens) - int(tokens)
+        TamoLogger.loga("INFO","MySQLConnection.update_subtract_user_tokens", f"current_tokens = {current_tokens}, tokens = {tokens}, updated_tokens = {updated_tokens}")
+
         cursor = self.connection.cursor()
-        query = f"UPDATE user SET tokens = tokens - {tokens} WHERE id = {user_id}"
+        query = f"UPDATE user SET tokens = {updated_tokens} WHERE id = {user_id}"
         cursor.execute(query)
         self.connection.commit()
 
