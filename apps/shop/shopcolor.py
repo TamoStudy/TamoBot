@@ -94,6 +94,6 @@ class ShopColor():
         # Return successful embed
         embed = discord.Embed(title=f'Successful Role Purchase', color=0xffa500)
         embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
-        embed.add_field(name='\u200b', value=f'You have successfully updated your role color to <@&{COLOR_ROLE_LIST[choice - 1]}>!.\n<:myemote:1097295903506829342> Your now have `{tokens}` <:customEmote:1096777370318413954> Tamo tokens.')
+        embed.add_field(name='\u200b', value=f'You have successfully updated your role color to\n<@&{COLOR_ROLE_LIST[choice - 1]}>!.\n<:myemote:1097295903506829342> Your now have `{tokens}` <:customEmote:1096777370318413954> Tamo tokens.')
         
         return embed
