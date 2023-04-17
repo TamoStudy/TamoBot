@@ -218,7 +218,8 @@ async def shop(interaction: discord.Interaction, hex: str = None):
 """
 @bot.tree.command(name='shopcolor', description='Use 500 Tamo tokens to change the color of your discord name!')
 async def shopcolor(interaction: discord.Interaction, color: str = None):
-    if str is None:
+    TamoLogger.loga("INFO", "main.shopcolor", f"Shop Color Event Received by {interaction.user.name}. color = {color}")
+    if color is None:
         embed = shopcolor_app.show_color_shop(interaction)
         await interaction.response.send_message(embed=embed)
     else:
