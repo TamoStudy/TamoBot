@@ -9,9 +9,9 @@ class Help:
         """
         embed = discord.Embed(title="TamoBot Help")
         embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
-        embed.add_field(name=':gear: General', value='`/help` - Get help! Oh wait, you\'re on this page right now.\n`/rules` - View the server rules.\n`/roll` - Randomly roll a number.\n`/8ball [q]` - Ask the magic 8 ball a question.\n`/motivation` - Get some motivation!', inline=False)
-        embed.add_field(name=':busts_in_silhouette: Profile & Time Tracking', value='`/stats` - View your TamoBot statistics.\n`/top` - View the server focus leaderboard.', inline=False)
-        embed.add_field(name=':shopping_bags: Shop', value='`/shop embed [hex]` (1000 Tamo tokens) - Customize profile embed color.\n`/shop color [no.]` (500 Tamo tokens) - Customize your server name color, resets monthly.', inline=False)
-        embed.add_field(name=':joystick: Arcade', value='`/trivia` (100 Tamo tokens)', inline=False)
+        embed.add_field(name=':gear: General', value='**━━━━━━━━━━━━━━━**\n`/help`\n<:myemote:1097295903506829342> Get help! Oh wait, you\'re on this page right now.\n`/rules`\n<:myemote:1097295903506829342> View the server rules.\n`/roll [optional: max]`\n<:myemote:1097295903506829342>Randomly roll a number.\n`/8ball [question]`\n<:myemote:1097295903506829342> Ask the magic 8 ball a question.\n`/motivation [optional: user]`\n<:myemote:1097295903506829342> Get some motivation!\n**━━━━━━━━━━━━━━━**', inline=False)
+        embed.add_field(name=':busts_in_silhouette: Profile & Time Tracking', value='**━━━━━━━━━━━━━━━**\n`/stats`\n<:myemote:1097295903506829342>View your TamoBot statistics.\n`/top`\n<:myemote:1097295903506829342>View the server focus leaderboard.\n**━━━━━━━━━━━━━━━**', inline=False)
+        embed.add_field(name=':shopping_bags: Shop', value='**━━━━━━━━━━━━━━━**\n`/shopembed [hex]` (1000 <:customEmote:1096777370318413954> Tamo tokens)\n<:myemote:1097295903506829342> Customize profile embed color.\n`/shopcolor [#]` (500 <:customEmote:1096777370318413954> Tamo tokens)\n<:myemote:1097295903506829342> Customize your server name color, resets monthly.\n**━━━━━━━━━━━━━━━**', inline=False)
+        embed.add_field(name=':joystick: Arcade', value='**━━━━━━━━━━━━━━━**\n`/trivia` (100 <:customEmote:1096777370318413954> Tamo tokens)\n<:myemote:1097295903506829342> Answer fun and simple trivia questions.\n**━━━━━━━━━━━━━━━**', inline=False)
         embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
         return embed

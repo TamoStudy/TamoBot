@@ -5,6 +5,7 @@ import traceback
 from sql.mysqlconnection import MySQLConnection
 from tools.tamolog import TamoLogger
 
+SECONDS_FOR_TAMO_TOKEN = 300
 FOCUS_ROOMS = [977235101249327114, 851513379503079524, 973214029893992529]
 user_time = {}
 called_stats_time = {}
@@ -50,7 +51,7 @@ class TimeTrack():
                             subtract_tokens = 0
 
                         focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
-                        tamo_tokens_earned = (focused_time_of_member // 144) - subtract_tokens
+                        tamo_tokens_earned = (focused_time_of_member // SECONDS_FOR_TAMO_TOKEN) - subtract_tokens
 
                         # Update MySQL User Entry
                         self.update_user_time_and_tokens_entry_in_database(member.id, focused_time_of_member, tamo_tokens_earned)
@@ -91,7 +92,7 @@ class TimeTrack():
                     subtract_tokens = 0
 
                 focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
-                tamo_tokens_earned = (focused_time_of_member // 144) - subtract_tokens
+                tamo_tokens_earned = (focused_time_of_member // SECONDS_FOR_TAMO_TOKEN) - subtract_tokens
 
                 TamoLogger.log("INFO", str(member.name) + " left " + str(before.channel.name) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
                 del user_time[member.id]
@@ -125,7 +126,7 @@ class TimeTrack():
             # Update Time based on voice connection
             try:
                 focused_time_of_member = round(time.time() - user_time[calling_user.id])
-                tamo_tokens_earned = focused_time_of_member // 144
+                tamo_tokens_earned = focused_time_of_member // SECONDS_FOR_TAMO_TOKEN
                 
                 if calling_user.id in called_stats_time and calling_user.id in called_stats_tokens:
                     TamoLogger.log("INFO", f"Inside of calling stats for user id {calling_user.id}")
