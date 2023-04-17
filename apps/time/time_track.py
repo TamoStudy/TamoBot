@@ -9,6 +9,7 @@ SECONDS_FOR_TAMO_TOKEN = 300
 FOCUS_ROOMS = [977235101249327114, 851513379503079524, 973214029893992529]
 user_time = {}
 called_stats_time = {}
+# TODO Rewrite my logic to only consider time
 called_stats_tokens = {}
 
 class TimeTrack():
@@ -92,7 +93,7 @@ class TimeTrack():
                     subtract_tokens = 0
 
                 focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
-                tamo_tokens_earned = (focused_time_of_member // SECONDS_FOR_TAMO_TOKEN) - subtract_tokens
+                tamo_tokens_earned = (focused_time_of_member // SECONDS_FOR_TAMO_TOKEN)
 
                 TamoLogger.log("INFO", str(member.name) + " left " + str(before.channel.name) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
                 del user_time[member.id]
