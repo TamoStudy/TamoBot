@@ -28,12 +28,12 @@ class MySQLConnection:
             database=self.database
         )
         if self.connection.is_connected():
-            TamoLogger.log("INFO", "Connected successfully to MySQL database")
+            TamoLogger.loga("SUCCESS", "MySQLConnection.connect", "Connected successfully to MySQL database")
 
     def disconnect(self):
         if self.connection.is_connected():
             self.connection.close()
-            TamoLogger.log("INFO", "Disconnected successfully from MySQL database")
+            TamoLogger.loga("SUCCESS", "MySQLConnection.disconnect", "Disconnected successfully from MySQL database")
 
     ##########################################
     ##########################################

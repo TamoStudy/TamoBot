@@ -13,7 +13,7 @@ class TamoLogger():
         if level == 'INFO':
             level_color = '\033[36m'
         elif level == 'WARN':
-            level_color = '\033[33m'
+            level_color = '\033[34m'
         elif level == 'SUCCESS':
             level_color = '\033[32m'
 
@@ -30,7 +30,7 @@ class TamoLogger():
         if level == 'INFO':
             level_color = '\033[36m'
         elif level == 'WARN':
-            level_color = '\033[33m'
+            level_color = '\033[34m'
         elif level == 'SUCCESS':
             level_color = '\033[32m'
 

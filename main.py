@@ -35,7 +35,13 @@ from apps.info.stats import Stats
 
 from apps.arcade.arcade import Arcade
 
-# Initialize TamoBot and related connections
+"""
+Initialize TamoBot and required connections.
+
+This creates the Bot object, specifies permitted servers,
+establishes MySQL database connection, and defines
+application connections.
+"""
 bot = commands.Bot(command_prefix='$', intents=discord.Intents.all())
 allowed_server = int(TamoSecrets.get_server())
 db = MySQLConnection(TamoSecrets.get_db_database())
@@ -73,7 +79,7 @@ async def on_ready():
             time_tracker.start_up(guild)
 
     # Set status message
-    await bot.change_presence(activity=discord.Game(name="/help | tamostudy.com"))
+    await bot.change_presence(activity=discord.Game(name="/help • tamostudy.com"))
 
     # Sync commands
     synced = await bot.tree.sync()
@@ -113,6 +119,7 @@ async def shutdown(ctx: commands.Context):
     user_has_role = discord.utils.get(ctx.author.roles, id=934885581614350348) is not None
     if user_has_role:
         time_tracker.handle_shutdown(guild)
+        db.disconnect()
         await ctx.send("Shutting down...")
         await bot.close()
         TamoLogger.loga("SUCCESS", "main.shutdown", f"TamoBot Close Successful")
@@ -136,15 +143,12 @@ async def on_voice_state_update(member: discord.Member, before: discord.VoiceSta
     TamoBot will first update time tracking for the member based off of received voice states. (via TimeTracker)
     Then, TamoBot will assign level roles according to the user's current month time. (via RoleAssign)
     """
-    # try:
     TamoLogger.loga("INFO", "main.on_voice_state_update", f"Attempting to get member and guild from incoming interaction {member}")
     guild = member.guild
 
-    TamoLogger.log("INFO", f"Voice State Update received by {member.name} in guild {guild.name}")
+    TamoLogger.loga("INFO", "main.on_voice_state_update", f"Voice State Update received by {member.name} in guild {guild.name}")
     time_tracker.update_time_on_event(member, before, after)
     await role_assign.check_role_updates_on_user(member, guild)
-    # except Exception as e:
-    #     TamoLogger.loga("ERROR", "main.on_voice_state_update", f"Error obtaining member and guild from incoming interaction. {e}")
 
 @bot.tree.command(name='stats', description='Displays the statistics of a user')
 async def stats(interaction: discord.Interaction, member: discord.Member = None):
@@ -155,7 +159,6 @@ async def stats(interaction: discord.Interaction, member: discord.Member = None)
     provided, the calling user is set as the user.
     """
     try:
-
         TamoLogger.loga("INFO", "main.stats", f"Attempting to get member and guild from incoming interaction")
         if member is None:
             member = interaction.guild.get_member(interaction.user.id)
@@ -178,6 +181,7 @@ async def top(interaction: discord.Interaction):
 
     Displays the top three focus leaders on the server.
     """
+    TamoLogger.loga("INFO", "main.top", f"Top command received from {interaction.user.name} in {interaction.guild.name}")
     embed = top_app.display_top(interaction)
     await interaction.response.send_message(embed=embed)
 
@@ -196,6 +200,7 @@ Displays the current server shop options.
 """
 @bot.tree.command(name='shop', description='View the shop listings.')
 async def shop(interaction: discord.Interaction):
+    TamoLogger.loga("INFO", "main.shop", f"Shop command received from {interaction.user.name} in {interaction.guild.name}")
     embed = Shop.show_shop_options()
     await interaction.response.send_message(embed=embed)
 
@@ -205,7 +210,8 @@ async def shop(interaction: discord.Interaction):
 User calls the command to purchase the embed to add to their profile
 """
 @bot.tree.command(name='shopembed', description='Use 1000 Tamo tokens to change the color of your profile embed.')
-async def shop(interaction: discord.Interaction, hex: str = None):
+async def shopembed(interaction: discord.Interaction, hex: str = None):
+    TamoLogger.loga("INFO", "main.shopembed", f"Shop Embed command received from {interaction.user.name} in {interaction.guild.name}")
     time_tracker.update_time_on_call(interaction, interaction.user)
     if hex and re.match(r'^[0-9a-fA-F]{6}$', hex):
         embed = shopembed_app.purchase_embed(interaction.user.id, hex)
@@ -219,7 +225,7 @@ async def shop(interaction: discord.Interaction, hex: str = None):
 """
 @bot.tree.command(name='shopcolor', description='Use 500 Tamo tokens to change the color of your discord name!')
 async def shopcolor(interaction: discord.Interaction, color: str = None):
-    TamoLogger.loga("INFO", "main.shopcolor", f"Shop Color Event Received by {interaction.user.name}. color = {color}")
+    TamoLogger.loga("INFO", "main.shopcolor", f"Shop Color command received by {interaction.user.name} in {interaction.guild.name}. color = {color}")
     time_tracker.update_time_on_call(interaction, interaction.user)
     if color is None:
         embed = shopcolor_app.show_color_shop(interaction)
@@ -253,6 +259,7 @@ Rolls a random number between 1 and a maximum number (default 100)
 """
 @bot.tree.command(name='roll', description='Rolls a random number between 1 and a max number (default 100)')
 async def roll(interaction: discord.Interaction, max_roll: str = '100'):
+    TamoLogger.loga("INFO", "main.roll", f"Roll command received from {interaction.user.name} in {interaction.guild.name}")
     embed = Roll.perform_action(interaction, max_roll)
     await interaction.response.send_message(embed=embed)
 
@@ -264,6 +271,7 @@ User can ask a question and receive a random response, similar to a magic 8-ball
 """
 @bot.tree.command(name='8ball', description='Magic 8 ball')
 async def eightball(interaction: discord.Interaction, question: str):
+    TamoLogger.loga("INFO", "main.eightball", f"8Ball command received from {interaction.user.name} in {interaction.guild.name}")
     response = EightBall.get_response()
     await interaction.response.send_message(f'**Question**: {question}\n**Answer**: {response}')
 
@@ -276,6 +284,7 @@ the user a motivational message.
 """
 @bot.tree.command(name='motivation', description='Get some motivation!')
 async def motivation(interaction: discord.Interaction, user: discord.User = None):
+    TamoLogger.loga("INFO", "main.motivation", f"Motivation command received from {interaction.user.name} in {interaction.guild.name}")
     response = Motivation.get_motivation_embed(interaction, user)
     await interaction.response.send_message(response)
 
@@ -295,6 +304,7 @@ Displays the commands of the server.
 """
 @bot.tree.command(name='help', description='Information on how to use TamoBot')
 async def help(interaction: discord.Interaction):
+    TamoLogger.loga("INFO", "main.help", f"Help command received from {interaction.user.name} in {interaction.guild.name}")
     embed = Help.get_help_embed()
     await interaction.response.send_message(embed=embed)
 
@@ -306,6 +316,7 @@ Displays the rules for the server.
 """
 @bot.tree.command(name='rules', description='Displays the rules for the server.')
 async def rules(interaction: discord.Interaction):
+    TamoLogger.loga("INFO", "main.rules", f"Rules command received from {interaction.user.name} in {interaction.guild.name}")
     rules_channel = bot.get_channel(821757961830793239)
     embed = Rules.get_rules_embed(rules_channel)
     await interaction.response.send_message(embed=embed)
@@ -325,6 +336,7 @@ Displays the game options in the arcade.
 """
 @bot.tree.command(name='arcade', description='Displays the game options in the arcade.')
 async def arcade(interaction: discord.Interaction):
+    TamoLogger.loga("INFO", "main.arcade", f"Arcade command received from {interaction.user.name} in {interaction.guild.name}")
     embed = Arcade.show_arcade_options()
     await interaction.response.send_message(embed=embed)
 
@@ -335,6 +347,7 @@ Answer fun trivia questions (100 Tamo tokens)
 """
 @bot.tree.command(name='trivia', description='Answer fun trivia questions (100 Tamo tokens)')
 async def trivia(interaction: discord.Interaction):
+    TamoLogger.loga("INFO", "main.trivia", f"Trivia command received from {interaction.user.name} in {interaction.guild.name}")
     await interaction.response.send_message("This feature is currently in development")
 
 # Starts the TamoBot

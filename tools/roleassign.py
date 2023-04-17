@@ -18,6 +18,7 @@ ROLE_IDS = {
 class RoleAssign():
     def __init__(self, db: MySQLConnection):
         self.db = db
+        TamoLogger.loga("INFO", "RoleAssign.__init__(db)", f"db successfully initialized in role_assign: {db}")
 
     async def check_role_updates_on_user(self, member: discord.Member, guild: discord.Guild = None):
         if guild.id not in ROLE_IDS:

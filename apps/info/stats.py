@@ -7,7 +7,7 @@ from tools.tamolog import TamoLogger
 class Stats():
     def __init__(self, db: MySQLConnection):
         self.db = db
-        TamoLogger.log("INFO", f"db successfully initialized in stats: {db}")
+        TamoLogger.loga("INFO", "Stats.__init__", f"db successfully initialized in stats: {db}")
 
     def show_statistics(self, interaction: discord.Interaction, user: discord.User = None):
         """
