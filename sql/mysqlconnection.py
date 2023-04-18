@@ -206,7 +206,7 @@ class MySQLConnection:
         query = f"""
                 SELECT user_id, stime
                 FROM monthtime
-                WHERE yr = {current_year} AND mth = {current_month}
+                WHERE yr = {current_year} AND mth = {current_month} AND user_id != 190552534019080193
                 GROUP BY user_id
                 ORDER BY stime DESC
                 LIMIT 10;
