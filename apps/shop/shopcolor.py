@@ -1,6 +1,7 @@
 import discord
 from sql.mysqlconnection import MySQLConnection
 from tools.tamolog import TamoLogger
+from tools.constants import Constants
 
 COLOR_ROLE_LIST = [
     1097320653218123817,
@@ -37,7 +38,7 @@ class ShopColor():
                         '` 9` → <@&1097320692661358612>\n`10` → <@&1097320700655718491>\n`11` → <@&1097320754351181825>\n`12` → <@&1097320757798916167>\n' +
                         '`13` → <@&1097320760260968578>\n`14` → <@&1097320762743996527>\n`15` → <@&1097320765239603321>\n`16` → <@&1097320771392639086>\n**━━━━━━━━━━━━━━━**', inline=False)
         embed.add_field(name='\u200b', value='To purchase a color, use the `/shopcolor [#]` command.\n<:myemote:1097295903506829342> Purchasing a color role costs 500 <:customEmote:1096777370318413954> Tamo tokens.\n<:myemote:1097295903506829342> Color roles reset every month.', inline=False)
-        embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
+        embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
         return embed
 
     async def purchase_color(self, member: discord.Member, guild: discord.Guild, choice: int):
@@ -56,7 +57,7 @@ class ShopColor():
             embed.set_thumbnail(url='https://github.com/narlock/Kaizen/blob/main/KaizenClient/assets/INFO_ERROR_ORANGE.png?raw=true')
             embed.add_field(name='\u200b', value=f'It costs `500` <:customEmote:1096777370318413954> Tamo tokens to perform this operation.\n<:myemote:1097295903506829342> You currently own `{tokens}` Tamo tokens.', inline=False)
             embed.add_field(name='\u200b', value=f'You can earn <:customEmote:1096777370318413954> Tamo tokens by spending focus time\nin a dedicated focus room!\n<:myemote:1097295903506829342> To check your amount of Tamo tokens, use `/stats`.', inline=False)
-            embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
+            embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
             
             return embed
         
@@ -95,5 +96,6 @@ class ShopColor():
         embed = discord.Embed(title=f'Successful Role Purchase', color=0xffa500)
         embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
         embed.add_field(name='\u200b', value=f'You have successfully updated your role color to\n<@&{COLOR_ROLE_LIST[choice - 1]}>!.\n<:myemote:1097295903506829342> Your now have `{tokens}` <:customEmote:1096777370318413954> Tamo tokens.')
-        
+        embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
+
         return embed

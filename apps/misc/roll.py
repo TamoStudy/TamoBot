@@ -1,6 +1,8 @@
 import random
 import discord
 
+from tools.constants import Constants
+
 class Roll:
     @staticmethod
     def perform_action(interaction: discord.Interaction, max_roll):
@@ -33,6 +35,6 @@ class Roll:
         embed.set_thumbnail(url=f'{interaction.user.avatar.url}')
         if footer_message is not None:
             embed.add_field(name='\u200b', value=footer_message)
-        embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
+        embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
 
         return embed

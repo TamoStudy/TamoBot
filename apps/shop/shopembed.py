@@ -2,6 +2,7 @@ import discord
 
 from tools.tamolog import TamoLogger
 from sql.mysqlconnection import MySQLConnection
+from tools.constants import Constants
 
 class ShopEmbed():
     def __init__(self, db: MySQLConnection):
@@ -19,7 +20,7 @@ class ShopEmbed():
             embed.set_thumbnail(url='https://github.com/narlock/Kaizen/blob/main/KaizenClient/assets/INFO_ERROR_ORANGE.png?raw=true')
             embed.add_field(name='\u200b', value=f'It costs `1000` <:customEmote:1096777370318413954> Tamo tokens to perform this operation.\n<:myemote:1097295903506829342> You currently own `{tokens}` Tamo tokens.', inline=False)
             embed.add_field(name='\u200b', value=f'You can earn <:customEmote:1096777370318413954> Tamo tokens by spending focus time\nin a dedicated focus room!\n<:myemote:1097295903506829342> To check your amount of Tamo tokens, use `/stats`.', inline=False)
-            embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
+            embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
             
             return embed
 
@@ -43,7 +44,7 @@ class ShopEmbed():
         embed = discord.Embed(title=f'Purchase successful!', color=color)
         embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
         embed.add_field(name='\u200b', value=f'You have successfully updated your embed color to `{hex}`.\n<:myemote:1097295903506829342> A preview of your color is on this embed.\n<:myemote:1097295903506829342> Your now have `{tokens}` <:customEmote:1096777370318413954> Tamo tokens.')
-        embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
+        embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
 
         return embed
             

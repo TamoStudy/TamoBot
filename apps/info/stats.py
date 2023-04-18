@@ -3,6 +3,7 @@ import math
 
 from sql.mysqlconnection import MySQLConnection
 from tools.tamolog import TamoLogger
+from tools.constants import Constants
 
 class Stats():
     def __init__(self, db: MySQLConnection):
@@ -51,6 +52,6 @@ class Stats():
         Under the condition that the user has a special title in 'feat',
         add this as a new field to the stats.
         """
-        embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
+        embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
 
         return embed

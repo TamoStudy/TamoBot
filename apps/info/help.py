@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from tools.constants import Constants
 
 class Help:
     @staticmethod
@@ -13,5 +14,5 @@ class Help:
         embed.add_field(name=':busts_in_silhouette: Profile & Time Tracking', value='**━━━━━━━━━━━━━━━**\n`/stats`\n<:myemote:1097295903506829342>View your TamoBot statistics.\n`/top`\n<:myemote:1097295903506829342>View the server focus leaderboard.\n**━━━━━━━━━━━━━━━**', inline=False)
         embed.add_field(name=':shopping_bags: Shop', value='**━━━━━━━━━━━━━━━**\n`/shopembed [hex]` (1000 <:customEmote:1096777370318413954> Tamo tokens)\n<:myemote:1097295903506829342> Customize profile embed color.\n`/shopcolor [#]` (500 <:customEmote:1096777370318413954> Tamo tokens)\n<:myemote:1097295903506829342> Customize your server name color, resets monthly.\n**━━━━━━━━━━━━━━━**', inline=False)
         embed.add_field(name=':joystick: Arcade', value='**━━━━━━━━━━━━━━━**\n`/trivia` (100 <:customEmote:1096777370318413954> Tamo tokens)\n<:myemote:1097295903506829342> Answer fun and simple trivia questions.\n**━━━━━━━━━━━━━━━**', inline=False)
-        embed.add_field(name='\u200b', value='Powered by [**narlock.dev**](https://narlock.github.io/narlock)', inline=False)
+        embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
         return embed
