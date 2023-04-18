@@ -172,7 +172,7 @@ async def stats(interaction: discord.Interaction, member: discord.Member = None)
         await interaction.response.send_message(embed=embed)
     except Exception as e:
         TamoLogger.loga("ERROR", "main.stats", f"Error obtaining member and guild from incoming interaction. {e}")
-        await interaction.response.send_message(embed=ErrorEmbed.message("Unexpected error occurred."))
+        await interaction.response.send_message(embed=ErrorEmbed.message("Member does not have a profile!\nMember has to have joined a focus room to have a profile."))
 
 @bot.tree.command(name='top', description='View the current all time focus leaders')
 async def top(interaction: discord.Interaction):

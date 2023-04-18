@@ -4,3 +4,5 @@ __pycache__/bot.cpython-311.pyc
 __pycache__/responses.cpython-311.pyc
 __pycache__/tamo_secrets.cpython-311.pyc
 *.pyc
+README Assets/.DS_Store
+.DS_Store
