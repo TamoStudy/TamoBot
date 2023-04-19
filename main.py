@@ -34,6 +34,8 @@ from apps.info.rules import Rules
 from apps.info.stats import Stats
 
 from apps.arcade.arcade import Arcade
+from apps.arcade.trivia import Trivia
+from apps.arcade.trivia import TriviaButtons
 
 """
 Initialize TamoBot and required connections.
@@ -53,6 +55,7 @@ stats_caller = Stats(db)
 top_app = Top(db)
 shopembed_app = ShopEmbed(db)
 shopcolor_app = ShopColor(db)
+trivia_app = Trivia()
 
 @bot.event
 async def on_ready():
@@ -348,7 +351,8 @@ Answer fun trivia questions (100 Tamo tokens)
 @bot.tree.command(name='trivia', description='Answer fun trivia questions (100 Tamo tokens)')
 async def trivia(interaction: discord.Interaction):
     TamoLogger.loga("INFO", "main.trivia", f"Trivia command received from {interaction.user.name} in {interaction.guild.name}")
-    await interaction.response.send_message("This feature is currently in development")
+    embed = trivia_app.play_trivia(interaction)
+    await interaction.response.send_message(embed=embed, view=TriviaButtons(db, embed, interaction.user.id))
 
 # Starts the TamoBot
 bot.run(TamoSecrets.get_token())
