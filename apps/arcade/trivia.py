@@ -11,6 +11,8 @@ class TriviaButtons(discord.ui.View):
         self.user_id = user_id
 
         # TODO Get Question, Options from MySQL Database
+        self.dbresponse = db.fetch_random_trivia_question()
+        TamoLogger.log(f'Trivia response = {self.dbresponse}')
         self.question = '**What is Discord\'s  signature color?**'
         self.options = ['Red', 'Blurple', 'Green', 'Gray']
         self.correct = 1
