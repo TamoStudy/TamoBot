@@ -331,6 +331,15 @@ class MySQLConnection:
         query = f'SELECT tokens FROM user WHERE id={user_id}'
         cursor.execute(query)
         return cursor.fetchone()[0]
+    
+    def fetch_random_trivia_question(self):
+        """
+        Fetches a random trivia question from the triviaquestion table.
+        """
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM triviaquestion ORDER BY RAND() LIMIT 1;")
+        result = cursor.fetchone()
+        return result
 
     ##########################################
     ##########################################
