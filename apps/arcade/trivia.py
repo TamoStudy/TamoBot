@@ -28,38 +28,43 @@ class TriviaButtons(discord.ui.View):
     @discord.ui.button(label='A', style=discord.ButtonStyle.blurple)
     async def option_a(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **A**', inline=False)
-        self.check_correct_answer(0)
+        self.check_correct_answer(interaction, 0)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
     @discord.ui.button(label='B', style=discord.ButtonStyle.blurple)
     async def option_b(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **B**', inline=False)
-        self.check_correct_answer(1)
+        self.check_correct_answer(interaction, 1)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
     @discord.ui.button(label='C', style=discord.ButtonStyle.blurple)
     async def option_c(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **C**', inline=False)
-        self.check_correct_answer(2)
+        self.check_correct_answer(interaction, 2)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
     @discord.ui.button(label='D', style=discord.ButtonStyle.blurple)
     async def option_d(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **D**', inline=False)
-        self.check_correct_answer(3)
+        self.check_correct_answer(interaction, 3)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
-    def check_correct_answer(self, selection: int):
+    def check_correct_answer(self, interaction: discord.Interaction, selection: int):
+        wins = self.update_wins(interaction)
         if selection == self.correct:
             self.embed.color = discord.Color.green()
-            self.embed.set_field_at(1, name='\u200b', value='You answered correctly!', inline=False)
+            self.embed.set_field_at(1, name='\u200b', value=f'You answered correctly!\nYou now have `{wins}` trivia questions correctly answered.', inline=False)
         else:
             self.embed.color = discord.Color.red()
-            self.embed.set_field_at(1, name='\u200b', value='You answered incorrectly!', inline=False)
+            self.embed.set_field_at(1, name='\u200b', value=f'You answered incorrectly!\nYou have `{wins}` trivia questions correctly answered.', inline=False)
+    
+    def update_wins(self, interaction: discord.Interaction) -> int:
+        self.db.update_trivia_win(interaction.user.id)
+        return self.db.fetch_trivia_by_id(interaction.user.id)
 
 class Trivia():
     def __init__(self):

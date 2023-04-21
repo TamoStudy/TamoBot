@@ -346,13 +346,20 @@ async def arcade(interaction: discord.Interaction):
 """
 /trivia
 
-Answer fun trivia questions (100 Tamo tokens)
+Answer fun trivia questions (25 Tamo tokens)
 """
 @bot.tree.command(name='trivia', description='Answer fun trivia questions (100 Tamo tokens)')
 async def trivia(interaction: discord.Interaction):
     TamoLogger.loga("INFO", "main.trivia", f"Trivia command received from {interaction.user.name} in {interaction.guild.name}")
-    embed = trivia_app.play_trivia(interaction)
-    await interaction.response.send_message(embed=embed, view=TriviaButtons(db, embed, interaction.user.id))
+    user_tokens = db.fetch_tokens_by_id(interaction.user.id)
+    if user_tokens < 25:
+        # User cannot play trivia
+        embed = ErrorEmbed.notokens(user_tokens, 25)
+        await interaction.response.send_message(embed=embed)
+    else:
+        db.update_subtract_user_tokens(interaction.user.id, 25)
+        embed = trivia_app.play_trivia(interaction)
+        await interaction.response.send_message(embed=embed, view=TriviaButtons(db, embed, interaction.user.id))
 
 # Starts the TamoBot
 bot.run(TamoSecrets.get_token())

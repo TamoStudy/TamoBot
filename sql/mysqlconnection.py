@@ -340,6 +340,12 @@ class MySQLConnection:
         cursor.execute("SELECT * FROM triviaquestion ORDER BY RAND() LIMIT 1;")
         result = cursor.fetchone()
         return result
+    
+    def fetch_trivia_by_id(self, user_id):
+        cursor = self.connection.cursor()
+        query = f'SELECT trivia FROM user WHERE id={user_id}'
+        cursor.execute(query)
+        return cursor.fetchone()[0]
 
     ##########################################
     ##########################################
@@ -415,6 +421,12 @@ class MySQLConnection:
 
         cursor = self.connection.cursor()
         query = f"UPDATE user SET tokens = {updated_tokens} WHERE id = {user_id}"
+        cursor.execute(query)
+        self.connection.commit()
+
+    def update_trivia_win(self, user_id):
+        cursor = self.connection.cursor()
+        query = f"UPDATE user SET trivia = trivia + 1 WHERE id = {user_id}"
         cursor.execute(query)
         self.connection.commit()
 
