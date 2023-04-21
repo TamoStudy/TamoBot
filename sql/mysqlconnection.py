@@ -234,8 +234,8 @@ class MySQLConnection:
         results = cursor.fetchall()
         top_users = []
         for result in results:
-            user = DBUser(*result)
-            top_users.append(user)
+            user_id, trivia = result
+            top_users.append( (user_id, trivia) )
         return top_users
 
     def fetch_month_time_of_user(self, user_id, month, year):

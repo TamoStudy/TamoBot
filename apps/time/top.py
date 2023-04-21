@@ -78,8 +78,8 @@ class Top():
 
         embed = discord.Embed(title='TamoBot Trivia Leaderboard <:myemote:1094329395994439790>', color=0xffa500)
         embed.set_thumbnail(url=f'{member_one.avatar.url}')
-        embed.add_field(name=':first_place: First', value=f'**{member_one.name}** ({member_one_trivia} hrs)', inline=False)
-        embed.add_field(name=':second_place: Second', value=f'**{member_two.name}** ({member_two_trivia} hrs)', inline=False)
-        embed.add_field(name=':third_place: Third', value=f'**{member_thr.name}** ({member_thr_trivia} hrs)', inline=False)
+        embed.add_field(name=':first_place: First', value=f'**{member_one.name}** ({member_one_trivia} correct answers)', inline=False)
+        embed.add_field(name=':second_place: Second', value=f'**{member_two.name}** ({member_two_trivia} correct answers)', inline=False)
+        embed.add_field(name=':third_place: Third', value=f'**{member_thr.name}** ({member_thr_trivia} correct answers)', inline=False)
 
         return embed
