@@ -12,10 +12,10 @@ class TriviaButtons(discord.ui.View):
 
         # TODO Get Question, Options from MySQL Database
         self.dbresponse = db.fetch_random_trivia_question()
-        TamoLogger.log(f'Trivia response = {self.dbresponse}')
-        self.question = '**What is Discord\'s  signature color?**'
-        self.options = ['Red', 'Blurple', 'Green', 'Gray']
-        self.correct = 1
+        TamoLogger.log('INFO', f'Trivia response = {self.dbresponse}')
+        self.question = f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\n**{self.dbresponse[1]}**'
+        self.options = [self.dbresponse[2], self.dbresponse[3], self.dbresponse[4], self.dbresponse[5]]
+        self.correct = self.dbresponse[6]
 
         self.options_message = f'**A**: {self.options[0]}\n**B**: {self.options[1]}\n**C**: {self.options[2]}\n**D**: {self.options[3]}'
         self.embed.set_field_at(0, name='\u200b', value=self.question, inline=False)
@@ -27,28 +27,28 @@ class TriviaButtons(discord.ui.View):
 
     @discord.ui.button(label='A', style=discord.ButtonStyle.blurple)
     async def option_a(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.embed.set_field_at(0, name='\u200b', value=f'You selected **A**', inline=False)
+        self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **A**', inline=False)
         self.check_correct_answer(0)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
     @discord.ui.button(label='B', style=discord.ButtonStyle.blurple)
     async def option_b(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.embed.set_field_at(0, name='\u200b', value=f'You selected **B**', inline=False)
+        self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **B**', inline=False)
         self.check_correct_answer(1)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
     @discord.ui.button(label='C', style=discord.ButtonStyle.blurple)
     async def option_c(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.embed.set_field_at(0, name='\u200b', value=f'You selected **C**', inline=False)
+        self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **C**', inline=False)
         self.check_correct_answer(2)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
 
     @discord.ui.button(label='D', style=discord.ButtonStyle.blurple)
     async def option_d(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.embed.set_field_at(0, name='\u200b', value=f'You selected **D**', inline=False)
+        self.embed.set_field_at(0, name='\u200b', value=f'**Category**: {self.dbresponse[8]}\n**By**: {self.dbresponse[7]}\n\nYou selected **D**', inline=False)
         self.check_correct_answer(3)
         self.clear_items()
         await interaction.response.edit_message(embed=self.embed, view=self)
