@@ -54,16 +54,18 @@ class TriviaButtons(discord.ui.View):
         await interaction.response.edit_message(embed=self.embed, view=self)
 
     def check_correct_answer(self, interaction: discord.Interaction, selection: int):
-        wins = self.update_wins(interaction)
-        if selection == self.correct:
+        won_status = selection == self.correct
+        wins = self.update_wins(won_status, interaction)
+        if won_status:
             self.embed.color = discord.Color.green()
             self.embed.set_field_at(1, name='\u200b', value=f'You answered correctly!\nYou now have `{wins}` trivia questions correctly answered.', inline=False)
         else:
             self.embed.color = discord.Color.red()
             self.embed.set_field_at(1, name='\u200b', value=f'You answered incorrectly!\nYou have `{wins}` trivia questions correctly answered.', inline=False)
     
-    def update_wins(self, interaction: discord.Interaction) -> int:
-        self.db.update_trivia_win(interaction.user.id)
+    def update_wins(self, won_status, interaction: discord.Interaction) -> int:
+        if won_status:
+            self.db.update_trivia_win(interaction.user.id)
         return self.db.fetch_trivia_by_id(interaction.user.id)
 
 class Trivia():
