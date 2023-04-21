@@ -76,14 +76,17 @@ Show support for this project by leaving a ⭐️ on our repository!
 </p>
 
 ### **Arcade**
-- In addition to using Tamo tokens as a means to enhance the flair of the user's experience, TamoBot also provides interactive 'arcade-style' games for the user to enjoy during their downtime. To view the list of games in the arcade, the user can type `/arcade`. This command will direct the user for the cost of each game, as well as the command to play it. By default, the cost to play any arcade game is `100` Tamo tokens. Server administrators can modify this value.
+- In addition to using Tamo tokens as a means to enhance the flair of the user's experience, TamoBot also provides interactive 'arcade-style' games for the user to enjoy during their downtime. To view the list of games in the arcade, the user can type `/arcade`. This command will direct the user for the cost of each game, as well as the command to play it. The purpose of making arcade games worth a price is so that users are incentivized to spend tim focusing, and use the arcade as a reward for their hard work.
 
 <p align="center">
 <img src="./README%20Assets/Arcade.png" style="border-radius: 20px;">
 </p>
 
 - During the development of Phase 1 of TamoBot, the current available arcade games are limited to:
-    - Trivia `/trivia` - answer fun and simple trivia questions. Utilize `/trivia top` to view the leaderboard for most answered trivia questions.
+    - Trivia `/trivia` - answer fun and simple trivia questions. Utilize `/top trivia` to view the leaderboard for most answered trivia questions.
+    <p align="center">
+    <img src="./README%20Assets/Trivia.png" style="border-radius: 20px;">
+    </p>
 
 ### **General**
 - TamoBot also provides general commands that are useful for all Discord servers. The user can utilize the `/help` command to view all of the bot's command at any time.
