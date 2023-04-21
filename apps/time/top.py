@@ -59,3 +59,27 @@ class Top():
         embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)
 
         return embed
+    
+    def display_top_trivia(self, interaction: discord.Interaction):
+        TamoLogger.loga("INFO", "top.display_top_trivia", f"Generating top embed. Requested by {interaction.user.name}")
+        
+        try:
+            user_list = self.db.fetch_top_3_trivia_users()
+        except Exception as e:
+            TamoLogger.loga("ERROR", "top.display_top_trivia", f"user_list creation failure on db.fetch_top_3_trivia_users. {e}")
+            return ErrorEmbed.message("Unexpected error occurred.")
+        
+        member_one = interaction.guild.get_member(user_list[0][0])
+        member_one_trivia = user_list[0][1]
+        member_two = interaction.guild.get_member(user_list[1][0])
+        member_two_trivia = user_list[1][1]
+        member_thr = interaction.guild.get_member(user_list[2][0])
+        member_thr_trivia = user_list[2][1]
+
+        embed = discord.Embed(title='TamoBot Trivia Leaderboard <:myemote:1094329395994439790>', color=0xffa500)
+        embed.set_thumbnail(url=f'{member_one.avatar.url}')
+        embed.add_field(name=':first_place: First', value=f'**{member_one.name}** ({member_one_trivia} hrs)', inline=False)
+        embed.add_field(name=':second_place: Second', value=f'**{member_two.name}** ({member_two_trivia} hrs)', inline=False)
+        embed.add_field(name=':third_place: Third', value=f'**{member_thr.name}** ({member_thr_trivia} hrs)', inline=False)
+
+        return embed

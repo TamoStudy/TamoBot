@@ -177,15 +177,21 @@ async def stats(interaction: discord.Interaction, member: discord.Member = None)
         TamoLogger.loga("ERROR", "main.stats", f"Error obtaining member and guild from incoming interaction. {e}")
         await interaction.response.send_message(embed=ErrorEmbed.message("Member does not have a profile!\nMember has to have joined a focus room to have a profile."))
 
-@bot.tree.command(name='top', description='View the current all time focus leaders')
-async def top(interaction: discord.Interaction):
+@bot.tree.command(name='top', description='View TamoBot leaderboards.')
+async def top(interaction: discord.Interaction, board: str = None):
     """
     /top
 
     Displays the top three focus leaders on the server.
     """
     TamoLogger.loga("INFO", "main.top", f"Top command received from {interaction.user.name} in {interaction.guild.name}")
-    embed = top_app.display_top(interaction)
+
+    if board is None:
+        embed = top_app.display_top(interaction)
+    elif board == 'trivia':
+        embed = top_app.display_top_trivia(interaction)
+    else:
+        embed = ErrorEmbed.message('Invalid parameter: board.\nOptions: `trivia`')
     await interaction.response.send_message(embed=embed)
 
 ##########################################
