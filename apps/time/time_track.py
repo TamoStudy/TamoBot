@@ -8,7 +8,6 @@ from tools.tamolog import TamoLogger
 SECONDS_FOR_TAMO_TOKEN = 300
 FOCUS_ROOMS = [977235101249327114, 851513379503079524, 973214029893992529]
 user_time = {}
-called_stats_time = {}
 
 class TimeTrack():
     def __init__(self, db: MySQLConnection):
@@ -39,12 +38,8 @@ class TimeTrack():
                 members = channel.members
                 for member in members:
                     if member.id in user_time:
-                        if member.id in called_stats_time:
-                            subtract_time = called_stats_time[member.id]
-                        else:
-                            subtract_time = 0
 
-                        focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
+                        focused_time_of_member = round(time.time() - user_time[member.id])
                         tamo_tokens_earned = (focused_time_of_member // SECONDS_FOR_TAMO_TOKEN)
 
                         # Update MySQL User Entry
@@ -64,17 +59,10 @@ class TimeTrack():
                     if member.id in user_time:
                         focused_time_of_member = round(time.time() - user_time[member.id])
 
-                        # If the user has time to subtract, maybe by /stats or /top was called.
-                        if member.id in called_stats_time:
-                            TamoLogger.log("INFO", f"Inside of calling stats for user id {member.id}")
-                            added_time = focused_time_of_member - called_stats_time[member.id]
-                        else:
-                            added_time = focused_time_of_member
+                        tamo_tokens_earned = focused_time_of_member // SECONDS_FOR_TAMO_TOKEN
 
-                        tamo_tokens_earned = added_time // SECONDS_FOR_TAMO_TOKEN
-
-                        # Store new calling values
-                        called_stats_time[member.id] = focused_time_of_member                  # Store # to subtract on disconnect
+                        # Resetting time
+                        user_time[member.id] = time.time()
 
                         # Update MySQL User Entry
                         self.update_user_time_and_tokens_entry_in_database(member.id, focused_time_of_member, tamo_tokens_earned)
@@ -83,7 +71,6 @@ class TimeTrack():
 
     def update_time_on_event(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         TamoLogger.log("INFO", f"Update Time Event Received in Time Track. Current user_time {user_time}")
-        TamoLogger.log("INFO", f"Current called_stats_time: {called_stats_time}")
 
         # Event when joining a focus room
         if member.id not in user_time and (before.channel is None or before.channel not in FOCUS_ROOMS) and (after.channel is not None and after.channel.id in FOCUS_ROOMS):
@@ -104,17 +91,10 @@ class TimeTrack():
             user_time dictionary as they are no longer in a focus room.
             """
             try:
-                # If the user call /stats or was caller for stats, subtract added time
-                if member.id in called_stats_time:
-                    subtract_time = called_stats_time[member.id]
-                    del called_stats_time[member.id]
-                else:
-                    subtract_time = 0
-
-                focused_time_of_member = round(time.time() - user_time[member.id]) - subtract_time
+                focused_time_of_member = round(time.time() - user_time[member.id])
                 tamo_tokens_earned = (focused_time_of_member // SECONDS_FOR_TAMO_TOKEN)
 
-                TamoLogger.log("INFO", str(member.name) + " left " + str(before.channel.name) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
+                TamoLogger.loga("INFO", "TimeTrack.update_time_on_event", str(member.name) + " left " + str(before.channel.name) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
                 del user_time[member.id]
 
                 # Update MySQL User Entry
@@ -147,21 +127,15 @@ class TimeTrack():
             try:
                 focused_time_of_member = round(time.time() - user_time[calling_user.id])
 
-                if calling_user.id in called_stats_time:
-                    TamoLogger.log("INFO", f"Inside of calling stats for user id {calling_user.id}")
-                    added_time = focused_time_of_member - called_stats_time[calling_user.id]
-                else:
-                    added_time = focused_time_of_member
+                tamo_tokens_earned = focused_time_of_member // SECONDS_FOR_TAMO_TOKEN
 
-                tamo_tokens_earned = added_time // SECONDS_FOR_TAMO_TOKEN
+                # Resetting Time
+                user_time[calling_user.id] = focused_time_of_member                  # Store # to subtract on disconnect
 
-                # Store new calling values
-                called_stats_time[calling_user.id] = focused_time_of_member                  # Store # to subtract on disconnect
-
-                TamoLogger.log("INFO", "Updating /stats for " + str(calling_user.id) + ". " + str(added_time) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
+                TamoLogger.loga("INFO", "TimeTrack.update_time_on_call", "Updating /stats for " + str(calling_user.id) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
 
                 # Update MySQL User Entry
-                self.update_user_time_and_tokens_entry_in_database(calling_user.id, added_time, tamo_tokens_earned)
+                self.update_user_time_and_tokens_entry_in_database(calling_user.id, focused_time_of_member, tamo_tokens_earned)
             except KeyError as e:
                 TamoLogger.log("ERROR", f"KeyError occurred when accessing user_time. Invalid Key: {e.args[0]}")
             except:
