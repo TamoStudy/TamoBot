@@ -130,7 +130,7 @@ class TimeTrack():
                 tamo_tokens_earned = focused_time_of_member // SECONDS_FOR_TAMO_TOKEN
 
                 # Resetting Time
-                user_time[calling_user.id] = focused_time_of_member                  # Store # to subtract on disconnect
+                user_time[calling_user.id] = time.time()
 
                 TamoLogger.loga("INFO", "TimeTrack.update_time_on_call", "Updating /stats for " + str(calling_user.id) + ". " + str(focused_time_of_member) + " seconds added to time, earning " + str(tamo_tokens_earned) + " Tamo tokens.")
 
