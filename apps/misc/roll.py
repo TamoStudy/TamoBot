@@ -32,7 +32,10 @@ class Roll:
             footer_message = 'Use the /roll command to try again.'
 
         embed = discord.Embed(title=f'{roll_message}', color=0xffa500)
-        embed.set_thumbnail(url=f'{interaction.user.avatar.url}')
+        try:
+            embed.set_thumbnail(url=f'{interaction.user.avatar.url}')
+        except Exception as e:
+            embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
         if footer_message is not None:
             embed.add_field(name='\u200b', value=footer_message)
         embed.add_field(name='\u200b', value=Constants.get_footer_string(), inline=False)

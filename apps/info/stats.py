@@ -44,7 +44,10 @@ class Stats():
         color = discord.Colour.from_rgb(red, green, blue)
 
         embed = discord.Embed(title=f'TamoBot Statistics for {calling_user.name}', color=color)
-        embed.set_thumbnail(url=f'{calling_user.avatar.url}')
+        try:
+            embed.set_thumbnail(url=f'{calling_user.avatar.url}')
+        except Exception as e:
+            embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
         embed.add_field(name='General', value=f':hourglass: **Today\'s Focus:** {daily_stime} hrs\n:calendar: **Month Focus:** {month_stime} hrs\n:star: **Total Focus:** {user_stime} hrs\n<:customEmote:1096777370318413954> **Tamo Tokens:** {user_tokens}', inline = False)
         embed.add_field(name='Arcade', value=f':question: **Trivia Questions Answered:** {user_trivia}')
         """

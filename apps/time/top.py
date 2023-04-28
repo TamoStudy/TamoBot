@@ -77,7 +77,10 @@ class Top():
         member_thr_trivia = user_list[2][1]
 
         embed = discord.Embed(title='TamoBot Trivia Leaderboard <:myemote:1094329395994439790>', color=0xffa500)
-        embed.set_thumbnail(url=f'{member_one.avatar.url}')
+        try:
+            embed.set_thumbnail(url=f'{member_one.avatar.url}')
+        except Exception as e:
+            embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
         embed.add_field(name=':first_place: First', value=f'**{member_one.name}** ({member_one_trivia} correct answers)', inline=False)
         embed.add_field(name=':second_place: Second', value=f'**{member_two.name}** ({member_two_trivia} correct answers)', inline=False)
         embed.add_field(name=':third_place: Third', value=f'**{member_thr.name}** ({member_thr_trivia} correct answers)', inline=False)
