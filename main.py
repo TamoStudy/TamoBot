@@ -20,6 +20,7 @@ from tamo_secrets import TamoSecrets
 from apps.time.time_track import TimeTrack
 from tools.roleassign import RoleAssign
 from apps.time.top import Top
+from tools.resetmonth import ResetMonth
 
 from apps.shop.shop import Shop
 from apps.shop.shopembed import ShopEmbed
@@ -129,6 +130,24 @@ async def shutdown(ctx: commands.Context):
     else:
         await ctx.send("LOL! :rofl:")
         TamoLogger.loga("WARN", "main.shutdown", f"Shutdown attempt failure. User has inproper permissions.")
+
+@bot.command(name='resetmonth')
+async def resetmonth(ctx: commands.Context):
+    """
+    $resetmonth
+
+    Traditional context command for administrator use only.
+    This will reset the monthly roles for the users.
+    """
+    TamoLogger.loga("INFO", "main.resetmonth", f"Received resetmonth command from {ctx.author.name}")
+    user_has_role = discord.utils.get(ctx.author.roles, id=934885581614350348) is not None
+    if user_has_role:
+        await ResetMonth.reset_month_and_color_roles(ctx)
+        await ctx.send("**Month Reset** is commencing... Please be patient if any issues occur.")
+        TamoLogger.loga("SUCCESS", "main.resetmonth", f"TamoBot Reset Month Successful")
+    else:
+        await ctx.send("LOL! :rofl:")
+        TamoLogger.loga("WARN", "main.shutdown", f"Reset Month attempt failure. User has inproper permissions.")
 
 ##########################################
 ##########################################
