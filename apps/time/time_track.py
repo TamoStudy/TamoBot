@@ -121,6 +121,7 @@ class TimeTrack():
         if user is not None:
             calling_user = user
 
+        self.db.create_user_requirements_if_dne(calling_user.id)
         # Check if user is in voice channel, if they are update info accordingly
         if calling_user.id in user_time:
             # Update Time based on voice connection

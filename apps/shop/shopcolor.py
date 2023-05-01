@@ -1,7 +1,24 @@
 import discord
+import datetime
 from sql.mysqlconnection import MySQLConnection
 from tools.tamolog import TamoLogger
 from tools.constants import Constants
+
+MONTHS = [
+    "MissingNo",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+]
 
 COLOR_ROLE_LIST = [
     1097320653218123817,
@@ -31,9 +48,12 @@ class ShopColor():
         """
         Generates the embed for the shop.
         """
+        current_month = datetime.datetime.utcnow().month
+        month = MONTHS[current_month]
+
         embed = discord.Embed(title=f'Change your name color!', color=0xffa500)
         embed.set_thumbnail(url='https://raw.githubusercontent.com/TamoStudy/TamoBot/main/README%20Assets/TamoBot.png')
-        embed.add_field(name=':calendar_spiral: April Name Colors', value='**━━━━━━━━━━━━━━━**\n` 1` → <@&1097320653218123817>\n` 2` → <@&1097320665536802957>\n` 3` → <@&1097320668959342713>\n` 4` → <@&1097320671555637353>\n' +
+        embed.add_field(name=f':calendar_spiral: {month} Name Colors', value='**━━━━━━━━━━━━━━━**\n` 1` → <@&1097320653218123817>\n` 2` → <@&1097320665536802957>\n` 3` → <@&1097320668959342713>\n` 4` → <@&1097320671555637353>\n' +
                         '` 5` → <@&1097320674202230794>\n` 6` → <@&1097320679323480064>\n` 7` → <@&1097320683597484034>\n` 8` → <@&1097320689301733377>\n' +
                         '` 9` → <@&1097320692661358612>\n`10` → <@&1097320700655718491>\n`11` → <@&1097320754351181825>\n`12` → <@&1097320757798916167>\n' +
                         '`13` → <@&1097320760260968578>\n`14` → <@&1097320762743996527>\n`15` → <@&1097320765239603321>\n`16` → <@&1097320771392639086>\n**━━━━━━━━━━━━━━━**', inline=False)
